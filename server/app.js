@@ -51,7 +51,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('changeProfile', data => {
-    io.emit('changeProfile', data);
+    socket.broadcast.to(room).emit('changeProfile', data);
   })
 });
 

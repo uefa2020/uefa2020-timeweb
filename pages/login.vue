@@ -26,6 +26,7 @@
             name="login"
             prepend-icon="fas fa-user"
             type="text"
+            light
             color="purple lighten-2"
             v-model="login"
             :rules="[rules.required]"
@@ -38,6 +39,7 @@
             :append-icon="showPassword ? 'fas fa-eye' : 'fas fa-eye-slash'"
             :type="showPassword ? 'text' : 'password'"
             @click:append="showPassword = !showPassword"
+            light
             color="purple lighten-2"
             v-model="password"
             :rules="[rules.required]"

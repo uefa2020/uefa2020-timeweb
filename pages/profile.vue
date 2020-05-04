@@ -57,7 +57,7 @@
             </v-col>
 
             <v-col v-if="gambler.photo" cols="auto" class="py-0">
-              <v-img width="50" height="67" :src="`/photo/${gambler.photo}`" />
+              <v-img width="50" height="67" :src="`/photo/${gambler.photo}`"/>
             </v-col>
           </v-row>
 
@@ -71,7 +71,7 @@
               v-model="file"
             />
             <div
-              class="mb-1 font-weight-thin font-italic indigo--text text--darken-4 caption"
+              class="mb-1 font-italic indigo--text text--darken-4 caption"
               :style="{lineHeight: '12px'}"
             >
               Пожалуйста, загружайте фото с соотношением сторон 3х4. Постарайтесь, чтобы Ваше лицо располагалось
@@ -103,8 +103,13 @@
       return (store.getters['gambler/isAuth'] ? 'default' : 'auth')
     },
     async asyncData({store}) {
-      let user = await store.getters['gambler/getGambler'];
-      return {user}
+      const user = await store.getters['gambler/getGambler'];
+      const isSign = await store.getters['gambler/isSign'];
+
+      return {
+        user,
+        isSign
+      }
     },
     data() {
       return {
@@ -173,7 +178,11 @@
         this.loading = false;
 
         if (await this.$store.getters['gambler/isAuth']) {
-          this.$socket.emit('changeProfile', {nickname: this.gambler.nickname});
+          this.$socket.emit('changeProfile', {
+            nickname: this.gambler.nickname,
+            sex: this.gambler.sex,
+            isSign: this.isSign
+          });
           this.$router.push('/gambler')
         }
       }
