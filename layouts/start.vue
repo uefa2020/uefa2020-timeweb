@@ -5,7 +5,7 @@
       top
       :color="color"
     >
-      <v-icon color="yellow" class="mr-5">fas fa-exclamation-circle</v-icon>
+      <!--<v-icon color="yellow" class="mr-5">fas fa-exclamation-circle</v-icon>-->
       <div class="text-center" :style="{width: '100%'}">{{message}}</div>
     </v-snackbar>
 

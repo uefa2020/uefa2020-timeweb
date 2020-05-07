@@ -70,6 +70,8 @@
 </template>
 
 <script>
+  import {mapGetters, mapActions} from 'vuex'
+
   import MuDrawerLeft from '~/components/DrawerLeft'
   import MuDrawerRight from '~/components/DrawerRight'
   import MuHeaderUser from '~/components/HeaderUser'
@@ -98,14 +100,19 @@
       this.drawerRight = this.$vuetify.breakpoint.width < 700 ? false : true;
     },
     computed: {
-      isMessage() {
-        return this.$store.getters['common/isMessage'];
+      ...mapGetters({
+        getMessage: 'common/getMessage',
+        isMessage: 'common/isMessage',
+        getGambler: 'gambler/getGambler'
+      }),
+      checkMessage() {
+        return this.isMessage;
       }
     },
     watch: {
-      isMessage(isMessage) {
+      checkMessage(isMessage) {
         if (isMessage) {
-          const message = this.$store.getters['common/getMessage'];
+          const message = this.getMessage;
           this.color = message.status;
           this.message = message.text;
           this.snackbar = true
@@ -113,14 +120,22 @@
       }
     },
     methods: {
+      ...mapActions({
+        logout: 'gambler/logout'
+      }),
       isOpenDialog(data) {
         this.dialog = data.dialog
       },
-      async closeApp(data) {
+      closeApp(data) {
         this.dialog = false;
 
         if (data.close) {
-          await this.$store.dispatch('gambler/logout');
+          const gambler = this.getGambler;
+
+          this.logout();
+
+          this.$socket.emit('logout', gambler);
+
           this.$router.push('/login');
         }
       }

@@ -5,7 +5,7 @@ import jwtDecode from 'jwt-decode'
 export const state = () => ({
   gambler: null,
   token: null,
-  gamblers: []
+  gamblers: [],
 });
 
 export const getters = {
@@ -14,7 +14,7 @@ export const getters = {
   isAuth: state => (!!state.gambler && (state.gambler.status > 0)),
   isAdmin: state => (!!state.gambler ? state.gambler.admin : false),
   getGamblers: state => state.gamblers,
-  getGamblersByNick: state => state.gamblers.slice().sort((a, b) => {
+  getGamblersOrderByNick: state => state.gamblers.slice().sort((a, b) => {
     // Используем toUpperCase() для преобразования регистра
     const family1 = a.family.toUpperCase();
     const family2 = b.family.toUpperCase();
@@ -64,7 +64,7 @@ export const mutations = {
       return obj
     }, {place: 1, count: 1});
     state.gamblers = payload
-  }
+  },
 };
 
 export const actions = {
@@ -110,6 +110,7 @@ export const actions = {
   async login({commit, dispatch}, payload) {
     try {
       await commit('common/CLEAR_MESSAGE', null, {root: true});
+
       const data = await this.$axios.$get('/api/gambler/login', {
         params: {
           login: payload.login,
@@ -123,8 +124,9 @@ export const actions = {
           text: data.error
         }, {root: true});
       } else {
-        commit('SET_GAMBLER', data.gambler);
-        dispatch('setToken', data.token)
+        await commit('SET_GAMBLER', data.gambler);
+        await dispatch('setToken', data.token);
+        await dispatch('chat/loadGamblers', null, {root: true})
       }
     } catch (e) {
       console.log('Error checkGambler:', e);
@@ -224,13 +226,33 @@ export const actions = {
     }
   },
 
-  async logout({commit, dispatch}) {
-    await dispatch('clearToken');
-    //dispatch('clearAdmin');
-    await commit('common/SET_MESSAGE', {
-      status: 'primary',
-      text: 'Сессия закрыта'
-    }, {root: true});
+  async logout({getters, commit, dispatch}) {
+    try {
+      const data = await this.$axios.$get('/api/gambler/logout', {
+        params: {
+          id: getters['getGambler'].id
+        }
+      });
+
+      if (data.error) {
+        await commit('common/SET_MESSAGE', {
+          status: 'error',
+          text: data.error
+        }, {root: true});
+      } else {
+        await dispatch('clearToken');
+        await commit('common/SET_MESSAGE', {
+          status: 'primary',
+          text: 'Сессия закрыта'
+        }, {root: true});
+      }
+    } catch (e) {
+      console.log('Error logout:', e);
+      await commit('common/SET_MESSAGE', {
+        status: 'error',
+        text: 'Ошибка при выполнении logout (см. в консоли ошибку "Error logout")'
+      }, {root: true});
+    }
   },
 
   async autoLogin({commit, dispatch}) {
@@ -273,15 +295,24 @@ export const actions = {
 
   async loadGamblers({commit}) {
     try {
+      await commit('common/CLEAR_MESSAGE', null, {root: true});
+
       const data = await this.$axios.$get('/api/gambler/loadGamblers');
-      commit('LOAD_GAMBLERS', data)
+
+      if (data.error) {
+        await commit('common/SET_MESSAGE', {
+          status: 'error',
+          text: data.error
+        }, {root: true});
+      } else {
+        await commit('LOAD_GAMBLERS', data)
+      }
     } catch (e) {
       console.log('Error loadGamblers:', e);
-      await commit('common/CLEAR_MESSAGE', null, {root: true});
       await commit('common/SET_MESSAGE', {
         status: 'error',
         text: 'Ошибка при выполнении loadGamblers (см. в консоли ошибку "Error loadGamblers")'
       }, {root: true});
     }
-  }
+  },
 };

@@ -5,14 +5,18 @@ export const actions = {
   },
 
   async socket_addMessage({commit}, payload) {
-    await commit('message/ADD_MESSAGE', payload, {root: true})
+    await commit('chat/ADD_MESSAGE', payload, {root: true})
+  },
+
+  async socket_addToChat({commit}, payload) {
+    await commit('chat/ADD_GAMBLER', payload, {root: true})
   },
 
   async socket_messageToDB({commit}, payload) {
     try {
       await commit('common/CLEAR_MESSAGE', null, {root: true});
 
-      const data = await this.$axios.$get('/api/message/add', {
+      const data = await this.$axios.$get('/api/chat/addMessage', {
         params: {
           from: payload.from,
           to: payload.to,
@@ -59,5 +63,9 @@ export const actions = {
         text: message
       }, {root: true})
     }
+  },
+
+  async socket_logout({commit}, payload) {
+    await commit('chat/DELETE_GAMBLER', payload.id, {root: true});
   }
 };

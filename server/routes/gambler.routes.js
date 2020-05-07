@@ -7,6 +7,7 @@ const router = Router();
 router.get('/getPassword', gambler.getPassword);
 router.get('/login', gambler.login);
 router.get('/signup', gambler.signup);
+router.get('/logout', gambler.logout);
 router.get('/loadGamblers', gambler.loadGamblers);
 router.get('/loadGambler', gambler.loadGambler);
 /*router.post('/profile',

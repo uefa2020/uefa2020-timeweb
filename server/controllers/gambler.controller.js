@@ -64,8 +64,11 @@ module.exports.login = async (req, res) => {
     const gambler = rows[0];
 
     if (gambler) {
-      bcrypt.compare(req.query.password, gambler.password, function (err, result) {
+      bcrypt.compare(req.query.password, gambler.password, async function (err, result) {
         if (result) {
+          const query = 'UPDATE gamblers SET `connected` = 1 WHERE id = ?';
+          await pool.promise().execute(query, [gambler.id])
+
           const token = jwt.sign({
               login: gambler.nickname,
               id: gambler.id
@@ -83,6 +86,21 @@ module.exports.login = async (req, res) => {
       res.json({error})
     }
   });
+};
+
+module.exports.logout = async (req, res) => {
+  const query = 'UPDATE gamblers SET `connected` = 0 WHERE id = ?';
+  await pool.promise().execute(query, [req.query.id])
+  .then(result => {
+    if (result) {
+      res.json(true)
+    } else {
+      res.json({error: 'Ошибка при обновлении поля connected'})
+    }
+  })
+  .catch((e) => {
+    res.json({error: e.message})
+  })
 };
 
 module.exports.loadGambler = async (req, res) => {

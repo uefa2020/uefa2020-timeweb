@@ -88,14 +88,14 @@
     },
     methods: {
       ...mapActions({
-        actLogin: 'gambler/login'
+        actionLogin: 'gambler/login'
       }),
       async auth() {
         if (!this.$refs.form.validate()) return;
 
         this.loading = true;
 
-        await this.actLogin({
+        await this.actionLogin({
           login: this.login,
           password: this.password
         });

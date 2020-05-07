@@ -1,7 +1,22 @@
 const pool = require('../middleware/database');
 
-module.exports.loadAll = async (req, res) => {
-  const query = 'SELECT * FROM messages ORDER BY `date`';
+module.exports.loadGamblers = async (req, res) => {
+  const query = 'SELECT * FROM gamblers WHERE `connected` = 1 ORDER BY nickname';
+
+  await pool.promise().execute(query)
+  .then(([rows, fields]) => {
+    res.json(rows)
+  })
+  .catch((e) => {
+    res.json({error: e.message})
+  })
+};
+
+module.exports.loadMessages = async (req, res) => {
+  const query = 'SELECT IFNULL(g.nickname, \'администратор\') AS `from`, ' +
+    'm.message, m.date FROM messages m ' +
+    'LEFT JOIN gamblers g ON m.`from` = g.id ' +
+    'ORDER BY m.date';
 
   await pool.promise().execute(query)
   .then(([rows, fields]) => {
@@ -12,7 +27,7 @@ module.exports.loadAll = async (req, res) => {
   })
 };
 
-module.exports.add = async (req, res) => {
+module.exports.addMessage = async (req, res) => {
   const query = 'INSERT INTO messages (`from`, `to`, `message`) VALUES (?, ?, ?)';
 
   await pool.promise().execute(query, [

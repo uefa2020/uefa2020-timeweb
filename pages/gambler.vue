@@ -47,10 +47,10 @@
     name: 'gambler',
     computed: {
       ...mapGetters({
-        getGamblersByNick: 'gambler/getGamblersByNick'
+        getGamblersOrderByNick: 'gambler/getGamblersOrderByNick'
       }),
       gamblers() {
-        return this.getGamblersByNick
+        return this.getGamblersOrderByNick
       }
     }
   }

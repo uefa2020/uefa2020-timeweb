@@ -1,8 +1,13 @@
 <template>
   <div>
+    <ul class="d-flex">
+      <li class="mr-3" v-for="(gambler, i) in gamblers" :key="gambler.id">
+        {{gambler.nickname}}{{i < gamblers.length - 1 ? ',' : ''}}
+      </li>
+    </ul>
     <ul>
       <li v-for="message in messages" :key="message.id">
-        {{message.message}}
+        {{message.date}} {{message.from}}: {{message.message}}
       </li>
     </ul>
   </div>
@@ -14,12 +19,16 @@
   export default {
     name: 'chat',
     async asyncData({store}) {
-      await store.dispatch('message/loadMessages')
+      await store.dispatch('chat/loadMessages')
     },
     computed: {
       ...mapGetters({
-        getMessages: 'message/getMessages'
+        getGamblers: 'chat/getGamblers',
+        getMessages: 'chat/getMessages'
       }),
+      gamblers() {
+        return this.getGamblers
+      },
       messages() {
         return this.getMessages
       }
