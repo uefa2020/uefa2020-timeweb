@@ -106,7 +106,7 @@
           this.$router.push('/profile')
         } else if (this.getIsAuth) {
           this.$socket.emit('login', this.getGambler);
-          this.$router.push('/gambler')
+          this.$router.push('/chat')
         }
       }
     }

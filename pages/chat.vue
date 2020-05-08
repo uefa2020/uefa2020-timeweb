@@ -7,7 +7,7 @@
     </ul>
     <ul>
       <li v-for="message in messages" :key="message.id">
-        {{message.date}} {{message.from}}: {{message.message}}
+        {{$moment(message.date).format('DD.MM.YYYY HH:mm:ss')}} {{message.from}}: {{message.message}}
       </li>
     </ul>
   </div>

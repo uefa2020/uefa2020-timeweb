@@ -183,7 +183,7 @@
             sex: this.gambler.sex,
             isSign: this.isSign
           });
-          this.$router.push('/gambler')
+          this.$router.push('/chat')
         }
       }
     }

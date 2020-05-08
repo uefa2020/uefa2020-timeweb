@@ -34,11 +34,9 @@ io.on('connection', (socket) => {
 
     socket.emit('messageToDB', message);
 
-    socket.broadcast.to(room)
-    .emit('addToChat', data);
+    socket.broadcast.to(room).emit('addToChat', data);
 
-    socket.broadcast.to(room)
-    .emit('setMessage', {status: 'primary', text: message.message})
+    socket.broadcast.to(room).emit('setMessage', {status: 'primary', text: message.message})
   });
 
   socket.on('changeProfile', data => {
@@ -54,9 +52,24 @@ io.on('connection', (socket) => {
       message: `${data.nickname} ${data.sex === 'м' ? 'вышёл' : 'вышла'} из приложения`
     };
 
+    io.to(room).emit('addMessage', message);
     socket.broadcast.to(room).emit('messageToDB', message);
     socket.broadcast.to(room).emit('setMessage', {status: 'primary', text: message.message});
-  })
+  });
+
+  /*socket.on('disconnect', () => {
+    socket.emit('disconnect', 1);
+
+    const message = {
+      from: 0,
+      to: room,
+      message: 'MU ушёл'
+    };
+
+    io.to(room).emit('addMessage', message);
+    io.to(room).emit('messageToDB', message);
+    io.to(room).emit('setMessage', {status: 'primary', text: message.message});
+  })*/
 });
 
 module.exports = {app, server};

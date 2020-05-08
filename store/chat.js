@@ -39,6 +39,8 @@ export const mutations = {
     state.messages = payload
   },
   ADD_MESSAGE(state, payload) {
+    if (payload.from === 0) payload.from = 'администратор';
+
     state.messages.push(payload)
   }
 };

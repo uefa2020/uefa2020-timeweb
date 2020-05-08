@@ -7,7 +7,7 @@ export default function ({store, route, redirect}) {
     } else if (!store.getters['gambler/isAuth']) {
       redirect('/login')
     } else if (route.path === '/') {
-      redirect('/gambler')
+      redirect('/chat')
     }
   }
 }

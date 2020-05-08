@@ -67,5 +67,15 @@ export const actions = {
 
   async socket_logout({commit}, payload) {
     await commit('chat/DELETE_GAMBLER', payload.id, {root: true});
-  }
+  },
+
+  /*async socket_getGambler({getters}, payload) {
+    payload = getters['gambler/getGambler'];
+    console.log('socket:', payload)
+  },*/
+
+  /*async socket_disconnect({commit, dispatch}, id) {
+    await dispatch('gambler/clearToken', null, {root: true});
+    await commit('chat/DELETE_GAMBLER', id, {root: true});
+  }*/
 };
