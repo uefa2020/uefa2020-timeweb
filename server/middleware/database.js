@@ -6,7 +6,7 @@ const pool = mysql.createPool({
   user: 'root',
   password: 'root',
   database: 'uefa2020',
-  timezone: 'Z'
+  /*timezone: 'Z'*/
 });
 
 pool.getConnection((err, connection) => {

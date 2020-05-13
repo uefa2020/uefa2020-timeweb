@@ -19,32 +19,57 @@ io.on('connection', (socket) => {
   //console.log('a user connected');
 
   const room = 'uefa2020';
+  let gamblerId = 0;
+  let socketId = socket.id;
 
   socket.join(room); //Если будет несколько "комнат", то, наверное, правильнее подключаться к ней
                      //внутри прослушивания конкретного события
 
   socket.on('login', data => {
+    gamblerId = data.id;
+    data.socket_id = socketId;
+
+    socket.emit('setSocketId', data);
+
+    socket.broadcast.emit('addToChat', data);
+
     const message = {
       from: 0,
       to: room,
       message: `${data.nickname} ${data.sex === 'м' ? 'вошёл' : 'вошла'} в приложение`
     };
 
-    io.to(room).emit('addMessage', message);
-
     socket.emit('messageToDB', message);
 
-    socket.broadcast.to(room).emit('addToChat', data);
+    socket.broadcast.emit('sendMessage', message);
 
-    socket.broadcast.to(room).emit('setMessage', {status: 'primary', text: message.message})
+    socket.broadcast.emit('setMessage', {status: 'primary', text: message.message})
   });
 
+  /*socket.on('reload', data => {
+    console.log('socket-reload');
+    data.socket_id = socketId;
+
+    socket.emit('setSocketId', data);
+
+    socket.broadcast.emit('addToChat', data);
+  });*/
+
+  /*socket.on('chat', data => {
+    gamblerId = data.id;
+    data.socket_id = socketId;
+
+    socket.emit('setSocketId', data);
+
+    io.to(room).emit('addToChat', data);
+  });*/
+
   socket.on('changeProfile', data => {
-    socket.broadcast.to(room).emit('changeProfile', data);
+    socket.broadcast.emit('changeProfile', data);
   });
 
   socket.on('logout', data => {
-    socket.broadcast.to(room).emit('logout', data);
+    io.to(room).emit('logout', data);
 
     const message = {
       from: 0,
@@ -52,24 +77,20 @@ io.on('connection', (socket) => {
       message: `${data.nickname} ${data.sex === 'м' ? 'вышёл' : 'вышла'} из приложения`
     };
 
-    io.to(room).emit('addMessage', message);
-    socket.broadcast.to(room).emit('messageToDB', message);
-    socket.broadcast.to(room).emit('setMessage', {status: 'primary', text: message.message});
+    socket.emit('messageToDB', message);
+    socket.broadcast.emit('sendMessage', message);
+    socket.broadcast.emit('setMessage', {status: 'primary', text: message.message});
   });
 
-  /*socket.on('disconnect', () => {
-    socket.emit('disconnect', 1);
+  socket.on('disconnect', (reason) => {
+    io.of('/').clients((error, clients) => {
+      if (error) throw error;
 
-    const message = {
-      from: 0,
-      to: room,
-      message: 'MU ушёл'
-    };
-
-    io.to(room).emit('addMessage', message);
-    io.to(room).emit('messageToDB', message);
-    io.to(room).emit('setMessage', {status: 'primary', text: message.message});
-  })*/
+      if (clients.length > 0) { //иначе ничего сделать нельзя, так как некому "прослушать" данное событие (никого нет в комнате)
+        socket.broadcast.emit('update', {sockets: clients, id: gamblerId})
+      }
+    });
+  })
 });
 
 module.exports = {app, server};

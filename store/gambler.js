@@ -79,6 +79,7 @@ export const actions = {
     commit('CLEAR_TOKEN');
     Cookies.remove('uefa2020-jwt-token');
   },
+
   async signup({commit, dispatch}, payload) {
     try {
       await commit('common/CLEAR_MESSAGE', null, {root: true});
@@ -226,11 +227,11 @@ export const actions = {
     }
   },
 
-  async logout({getters, commit, dispatch}) {
+  async logout({commit, dispatch}, id) {
     try {
       const data = await this.$axios.$get('/api/gambler/logout', {
         params: {
-          id: getters['getGambler'].id
+          id
         }
       });
 
@@ -277,10 +278,18 @@ export const actions = {
           });
 
           if (gambler) {
-            commit('SET_GAMBLER', gambler);
-            dispatch('setToken', token)
+            await commit('SET_GAMBLER', gambler);
+            await dispatch('setToken', token);
+
+            const cookSocket = cookies['io'];
+            //socket.emit('reload', gambler);
+
+            if (cookSocket) {
+              gambler.socket_id = cookSocket;
+              await dispatch('setSocketId', gambler)
+            }
           } else {
-            dispatch('logout')
+            await dispatch('logout')
           }
         } catch (e) {
           console.log('Error loadGambler:', e);
@@ -315,4 +324,53 @@ export const actions = {
       }, {root: true});
     }
   },
+
+  async setSocketId({commit}, payload) {
+    try {
+      await commit('common/CLEAR_MESSAGE', null, {root: true});
+
+      const data = await this.$axios.$get('/api/gambler/setSocketId', {
+        params: {
+          id: payload.id,
+          socketId: payload.socket_id
+        }
+      });
+
+      if (data.error) {
+        await commit('common/SET_MESSAGE', {
+          status: 'error',
+          text: data.error
+        }, {root: true});
+      }
+    } catch (e) {
+      console.log('Error setSocketId:', e);
+      await commit('common/SET_MESSAGE', {
+        status: 'error',
+        text: 'Ошибка при выполнении setSocketId (см. в консоли ошибку "Error setSocketId")'
+      }, {root: true});
+    }
+  },
+
+  async disconnectGamblersBySocket({commit, dispatch}, payload) {
+    try {
+      const data = await this.$axios.$get('/api/gambler/disconnectGamblersBySocket', {
+        params: {
+          sockets: payload
+        }
+      });
+
+      if (data.error) {
+        await commit('common/SET_MESSAGE', {
+          status: 'error',
+          text: data.error
+        }, {root: true});
+      }
+    } catch (e) {
+      console.log('Error disconnectGamblersBySocket:', e);
+      await commit('common/SET_MESSAGE', {
+        status: 'error',
+        text: 'Ошибка при выполнении disconnectGamblersBySocket (см. в консоли ошибку "Error disconnectGamblersBySocket")'
+      }, {root: true});
+    }
+  }
 };

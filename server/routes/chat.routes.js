@@ -6,6 +6,6 @@ const router = Router();
 // /api/chat
 router.get('/loadGamblers', chat.loadGamblers);
 router.get('/loadMessages', chat.loadMessages);
-router.get('/addMessage', chat.addMessage);
+router.get('/saveMessage', chat.saveMessage);
 
 module.exports = router;

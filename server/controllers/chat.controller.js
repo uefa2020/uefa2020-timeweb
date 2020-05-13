@@ -1,7 +1,8 @@
 const pool = require('../middleware/database');
 
 module.exports.loadGamblers = async (req, res) => {
-  const query = 'SELECT * FROM gamblers WHERE `connected` = 1 ORDER BY nickname';
+  //const query = 'SELECT * FROM gamblers WHERE `connected` = 1 ORDER BY nickname';
+  const query = 'SELECT * FROM gamblers WHERE `socket_id` <> \'\' ORDER BY nickname';
 
   await pool.promise().execute(query)
   .then(([rows, fields]) => {
@@ -27,7 +28,7 @@ module.exports.loadMessages = async (req, res) => {
   })
 };
 
-module.exports.addMessage = async (req, res) => {
+module.exports.saveMessage = async (req, res) => {
   const query = 'INSERT INTO messages (`from`, `to`, `message`) VALUES (?, ?, ?)';
 
   await pool.promise().execute(query, [
@@ -35,7 +36,7 @@ module.exports.addMessage = async (req, res) => {
     req.query.to,
     req.query.message,
   ])
-  .then(async (result) => {
+  .then((result) => {
     if (result) {
       res.json(true)
     } else {

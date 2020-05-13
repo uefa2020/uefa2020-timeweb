@@ -10,6 +10,8 @@ router.get('/signup', gambler.signup);
 router.get('/logout', gambler.logout);
 router.get('/loadGamblers', gambler.loadGamblers);
 router.get('/loadGambler', gambler.loadGambler);
+router.get('/setSocketId', gambler.setSocketId);
+router.get('/disconnectGamblersBySocket', gambler.disconnectGamblersBySocket);
 /*router.post('/profile',
   upload.single('file'),
   gambler.profile

@@ -103,10 +103,10 @@
         this.loading = false;
 
         if (this.getIsSign) {
-          this.$router.push('/profile')
+          await this.$router.push('/profile')
         } else if (this.getIsAuth) {
-          this.$socket.emit('login', this.getGambler);
-          this.$router.push('/chat')
+          await this.$socket.emit('login', this.getGambler);
+          await this.$router.push('/gambler')
         }
       }
     }

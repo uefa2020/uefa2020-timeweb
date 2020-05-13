@@ -66,8 +66,8 @@ module.exports.login = async (req, res) => {
     if (gambler) {
       bcrypt.compare(req.query.password, gambler.password, async function (err, result) {
         if (result) {
-          const query = 'UPDATE gamblers SET `connected` = 1 WHERE id = ?';
-          await pool.promise().execute(query, [gambler.id])
+          /*const query = 'UPDATE gamblers SET `connected` = 1 WHERE id = ?';
+          await pool.promise().execute(query, [gambler.id])*/
 
           const token = jwt.sign({
               login: gambler.nickname,
@@ -77,9 +77,9 @@ module.exports.login = async (req, res) => {
             {expiresIn: 60 * 60 * 8} // 8 часов будет "жить" токен
           );
 
-          res.json({gambler: gambler, token: token})
+          await res.json({gambler: gambler, token: token})
         } else {
-          res.json({error})
+          await res.json({error})
         }
       })
     } else {
@@ -89,13 +89,15 @@ module.exports.login = async (req, res) => {
 };
 
 module.exports.logout = async (req, res) => {
-  const query = 'UPDATE gamblers SET `connected` = 0 WHERE id = ?';
+  //const query = 'UPDATE gamblers SET `connected` = 0 WHERE id = ?';
+  const query = 'UPDATE gamblers SET `socket_id` = \'\' WHERE id = ?';
+
   await pool.promise().execute(query, [req.query.id])
   .then(result => {
     if (result) {
       res.json(true)
     } else {
-      res.json({error: 'Ошибка при обновлении поля connected'})
+      res.json({error: 'Ошибка при обновлении поля socket_id'})
     }
   })
   .catch((e) => {
@@ -111,6 +113,47 @@ module.exports.loadGambler = async (req, res) => {
       res.json(rows[0])
     } else {
       res.json({error: 'Пользователь отсутствует. Токен сброшен.'})
+    }
+  })
+  .catch((e) => {
+    res.json({error: e.message})
+  })
+};
+
+module.exports.setSocketId = async (req, res) => {
+  const query = 'UPDATE gamblers SET `socket_id` = ? WHERE id = ?';
+  await pool.promise().execute(query, [
+    req.query.socketId,
+    req.query.id
+  ])
+  .then(result => {
+    if (result) {
+      res.json(true)
+    } else {
+      res.json({error: 'Ошибка при обновлении поля socket_id'})
+    }
+  })
+  .catch((e) => {
+    res.json({error: e.message})
+  })
+};
+
+module.exports.disconnectGamblersBySocket = async (req, res) => {
+  let sockets = '';
+
+  for (let i = 0; i < req.query.sockets.length; i++) {
+    if (sockets !== '') sockets += ', ';
+    sockets += req.query.sockets[i]
+  }
+
+  let query = 'UPDATE gamblers SET `socket_id` = \'\' WHERE `socket_id` NOT IN (' + sockets + ')';
+
+  await pool.promise().execute(query)
+  .then(result => {
+    if (result) {
+      res.json(true)
+    } else {
+      res.json({error: 'Ошибка при обновлении поля socket_id'})
     }
   })
   .catch((e) => {

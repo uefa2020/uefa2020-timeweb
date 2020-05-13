@@ -13,6 +13,9 @@ export const mutations = {
     state.gamblers = payload
   },
   ADD_GAMBLER(state, payload) {
+    // На всякий случай, сначала удаляем
+    state.gamblers = state.gamblers.filter(el => el.id !== payload.id);
+
     state.gamblers.push(payload);
 
     if (state.gamblers.length > 1) {
@@ -35,10 +38,16 @@ export const mutations = {
   DELETE_GAMBLER(state, payload) {
     state.gamblers = state.gamblers.filter(el => el.id !== payload);
   },
+  DELETE_GAMBLER_BY_SOCKET(state, payload) {
+    state.gamblers = state.gamblers.filter(el => payload.indexOf(el.socket_id) >= 0);
+  },
+  CLEAR_GAMBLERS(state) {
+    state.gamblers = []
+  },
   LOAD_MESSAGES(state, payload) {
     state.messages = payload
   },
-  ADD_MESSAGE(state, payload) {
+  SEND_MESSAGE(state, payload) {
     if (payload.from === 0) payload.from = 'администратор';
 
     state.messages.push(payload)
@@ -53,7 +62,6 @@ export const actions = {
       const data = await this.$axios.$get('/api/chat/loadGamblers');
 
       if (data.error) {
-        console.log('loadGamblers:', data.error);
         await commit('common/SET_MESSAGE', {
           status: 'error',
           text: data.error
@@ -77,7 +85,6 @@ export const actions = {
       const data = await this.$axios.$get('/api/chat/loadMessages');
 
       if (data.error) {
-        console.log('loadMessages:', data.error);
         await commit('common/SET_MESSAGE', {
           status: 'error',
           text: data.error
@@ -90,6 +97,33 @@ export const actions = {
       await commit('common/SET_MESSAGE', {
         status: 'error',
         text: 'Ошибка при выполнении loadMessages (см. в консоли ошибку "Error loadMessages")'
+      }, {root: true});
+    }
+  },
+
+  async saveMessage({commit}, payload) {
+    try {
+      await commit('common/CLEAR_MESSAGE', null, {root: true});
+
+      const data = await this.$axios.$get('/api/chat/saveMessage', {
+        params: {
+          from: payload.from,
+          to: payload.to,
+          message: payload.message
+        }
+      });
+
+      if (data.error) {
+        await commit('common/SET_MESSAGE', {
+          status: 'error',
+          text: data.error
+        }, {root: true});
+      }
+    } catch (e) {
+      console.log('Error saveMessage:', e);
+      await commit('common/SET_MESSAGE', {
+        status: 'error',
+        text: 'Ошибка при выполнении saveMessage (см. в консоли ошибку "Error saveMessage")'
       }, {root: true});
     }
   },

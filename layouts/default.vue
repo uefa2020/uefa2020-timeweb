@@ -132,7 +132,7 @@
         if (data.close) {
           const gambler = this.getGambler;
 
-          this.logout();
+          this.logout(gambler.id);
 
           this.$socket.emit('logout', gambler);
 
