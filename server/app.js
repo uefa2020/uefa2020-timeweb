@@ -35,6 +35,7 @@ io.on('connection', (socket) => {
 
     const message = {
       from: 0,
+      photo: '',
       to: room,
       message: `${data.nickname} ${data.sex === 'м' ? 'вошёл' : 'вошла'} в приложение`
     };

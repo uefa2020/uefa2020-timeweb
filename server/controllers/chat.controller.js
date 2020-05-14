@@ -15,7 +15,8 @@ module.exports.loadGamblers = async (req, res) => {
 
 module.exports.loadMessages = async (req, res) => {
   const query = 'SELECT IFNULL(g.nickname, \'администратор\') AS `from`, ' +
-    'm.message, m.date FROM messages m ' +
+    'IFNULL(g.photo, \'\') AS `photo`, m.message, m.date ' +
+    'FROM messages m ' +
     'LEFT JOIN gamblers g ON m.`from` = g.id ' +
     'ORDER BY m.date';
 
