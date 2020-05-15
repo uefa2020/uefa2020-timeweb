@@ -34,7 +34,8 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('addToChat', data);
 
     const message = {
-      from: 0,
+      fromId: 0,
+      fromNick: 'администратор',
       photo: '',
       to: room,
       message: `${data.nickname} ${data.sex === 'м' ? 'вошёл' : 'вошла'} в приложение`
@@ -45,6 +46,18 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('sendMessage', message);
 
     socket.broadcast.emit('setMessage', {status: 'primary', text: message.message})
+  });
+
+  socket.on('newMessage', data => {
+    socket.emit('messageToDB', data);
+
+    io.to(room).emit('sendMessage', data);
+  });
+
+  socket.on('editMessage', data => {
+    socket.emit('messageUpdateDB', data);
+
+    io.to(room).emit('updateMessage', data);
   });
 
   /*socket.on('reload', data => {
@@ -73,7 +86,8 @@ io.on('connection', (socket) => {
     io.to(room).emit('logout', data);
 
     const message = {
-      from: 0,
+      fromId: 0,
+      fromNick: 'администратор',
       to: room,
       message: `${data.nickname} ${data.sex === 'м' ? 'вышёл' : 'вышла'} из приложения`
     };

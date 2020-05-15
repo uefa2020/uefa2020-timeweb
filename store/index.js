@@ -5,7 +5,11 @@ export const actions = {
   },
 
   async socket_sendMessage({commit}, payload) {
-    await commit('chat/SEND_MESSAGE', payload, {root: true})
+    await commit('chat/ADD_MESSAGE', payload, {root: true})
+  },
+
+  async socket_updateMessage({commit}, payload) {
+    await commit('chat/UPDATE_MESSAGE', payload, {root: true})
   },
 
   async socket_addToChat({commit}, payload) {
@@ -14,6 +18,10 @@ export const actions = {
 
   async socket_messageToDB({dispatch}, payload) {
     await dispatch('chat/saveMessage', payload, {root: true});
+  },
+
+  async socket_messageUpdateDB({dispatch}, payload) {
+    await dispatch('chat/updateMessage', payload, {root: true});
   },
 
   async socket_setMessage({commit}, payload) {

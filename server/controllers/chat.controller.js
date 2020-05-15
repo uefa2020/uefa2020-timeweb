@@ -14,7 +14,8 @@ module.exports.loadGamblers = async (req, res) => {
 };
 
 module.exports.loadMessages = async (req, res) => {
-  const query = 'SELECT IFNULL(g.nickname, \'администратор\') AS `from`, ' +
+  const query = 'SELECT IFNULL(g.id, 0) AS `fromId`, ' +
+    'IFNULL(g.nickname, \'администратор\') AS `fromNick`, ' +
     'IFNULL(g.photo, \'\') AS `photo`, m.message, m.date ' +
     'FROM messages m ' +
     'LEFT JOIN gamblers g ON m.`from` = g.id ' +
@@ -48,3 +49,6 @@ module.exports.saveMessage = async (req, res) => {
     res.json({error: e.message})
   })
 };
+
+module.exports.updateMessage = async (req, res) => {
+}

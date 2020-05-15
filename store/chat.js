@@ -1,3 +1,37 @@
+const layoutAdmin = {
+  list: {
+    width: '50%',
+    class: 'mx-auto'
+  },
+  content: {
+    class: 'text-left'
+  }
+};
+const layoutLeft = {
+  list: {
+    width: '70%',
+    class: 'mr-auto'
+  },
+  avatar: {
+    class: 'order-first'
+  },
+  content: {
+    class: 'text-left'
+  }
+};
+const layoutRight = {
+  list: {
+    width: '70%',
+    class: 'ml-auto'
+  },
+  avatar: {
+    class: 'order-last'
+  },
+  content: {
+    class: 'text-right'
+  }
+};
+
 export const state = () => ({
   gamblers: [],
   messages: []
@@ -45,12 +79,47 @@ export const mutations = {
     state.gamblers = []
   },
   LOAD_MESSAGES(state, payload) {
-    state.messages = payload
+    state.messages = payload.map((item, i, arr) => {
+      if (item.fromId == 0) {
+        item.layout = layoutAdmin
+      } else if (i === 0 || arr[i - 1].fromId == 0) {
+        item.layout = layoutLeft
+      } else if (arr[i - 1].fromId == item.fromId) {
+        item.layout = arr[i - 1].layout
+      } else if (arr[i - 1].layout.list.class === 'mr-auto') {
+        item.layout = layoutRight
+      } else {
+        item.layout = layoutLeft
+      }
+
+      return item
+    })
   },
-  SEND_MESSAGE(state, payload) {
-    if (payload.from === 0) payload.from = 'администратор';
+  ADD_MESSAGE(state, payload) {
+    if (payload.fromId == 0) {
+      payload.layout = layoutAdmin
+    } else {
+      const i = state.messages.length - 1;
+
+      if (i < 0) {
+        payload.layout = layoutLeft
+      } else {
+        const message = state.messages[i];
+
+        if (payload.fromId == message.fromId) {
+          payload.layout = message.layout
+        } else if (message.layout.list.class === 'mr-auto') {
+          payload.layout = layoutRight
+        } else {
+          payload.layout = layoutLeft
+        }
+      }
+    }
 
     state.messages.push(payload)
+  },
+  UPDATE_MESSAGE(state, payload) {
+
   }
 };
 
@@ -107,7 +176,7 @@ export const actions = {
 
       const data = await this.$axios.$get('/api/chat/saveMessage', {
         params: {
-          from: payload.from,
+          from: payload.fromId,
           to: payload.to,
           message: payload.message
         }
@@ -127,4 +196,31 @@ export const actions = {
       }, {root: true});
     }
   },
-};
+
+  async updateMessage({commit}, payload) {
+    /*try {
+      await commit('common/CLEAR_MESSAGE', null, {root: true});
+
+      const data = await this.$axios.$get('/api/chat/updateMessage', {
+        params: {
+          from: payload.fromId,
+          to: payload.to,
+          message: payload.message
+        }
+      });
+
+      if (data.error) {
+        await commit('common/SET_MESSAGE', {
+          status: 'error',
+          text: data.error
+        }, {root: true});
+      }
+    } catch (e) {
+      console.log('Error saveMessage:', e);
+      await commit('common/SET_MESSAGE', {
+        status: 'error',
+        text: 'Ошибка при выполнении saveMessage (см. в консоли ошибку "Error saveMessage")'
+      }, {root: true});
+    }*/
+  }
+}
