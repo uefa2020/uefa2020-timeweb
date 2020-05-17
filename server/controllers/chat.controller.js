@@ -31,12 +31,13 @@ module.exports.loadMessages = async (req, res) => {
 };
 
 module.exports.saveMessage = async (req, res) => {
-  const query = 'INSERT INTO messages (`from`, `to`, `message`) VALUES (?, ?, ?)';
+  const query = 'INSERT INTO messages (`from`, `to`, `message`, `date`) VALUES (?, ?, ?, ?)';
 
   await pool.promise().execute(query, [
     req.query.from,
     req.query.to,
     req.query.message,
+    req.query.date
   ])
   .then((result) => {
     if (result) {
@@ -51,4 +52,43 @@ module.exports.saveMessage = async (req, res) => {
 };
 
 module.exports.updateMessage = async (req, res) => {
+  const query = 'UPDATE messages SET `message` = ?, `date` = ? WHERE `from` = ? AND `date` = ?';
+
+  await pool.promise().execute(query, [
+    req.query.message,
+    req.query.date,
+    req.query.fromId,
+    req.query.date,
+  ])
+  .then((result) => {
+    if (result) {
+      res.json(true)
+    } else {
+      res.json({error: 'Ошибка при обновлении сообщения в таблице messages'})
+    }
+  })
+  .catch((e) => {
+    res.json({error: e.message})
+  })
+};
+
+
+module.exports.deleteMessage = async (req, res) => {
+  const query = 'DELETE FROM messages WHERE `from` = ? AND `date` = ?';
+
+  await pool.promise().execute(query, [
+    req.query.fromId,
+    req.query.date,
+  ])
+  .then((result) => {
+    if (result) {
+      res.json(true)
+    } else {
+      res.json({error: 'Ошибка при удалении сообщения в таблице messages'})
+    }
+  })
+  .catch((e) => {
+    res.json({error: e.message})
+  })
 }
+

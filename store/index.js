@@ -12,12 +12,20 @@ export const actions = {
     await commit('chat/UPDATE_MESSAGE', payload, {root: true})
   },
 
+  async socket_deleteMessage({commit}, payload) {
+    await commit('chat/DELETE_MESSAGE', payload, {root: true})
+  },
+
   async socket_addToChat({commit}, payload) {
     await commit('chat/ADD_GAMBLER', payload, {root: true})
   },
 
   async socket_messageToDB({dispatch}, payload) {
     await dispatch('chat/saveMessage', payload, {root: true});
+  },
+
+  async socket_messageDeleteDB({dispatch}, payload) {
+    await dispatch('chat/deleteMessage', payload, {root: true});
   },
 
   async socket_messageUpdateDB({dispatch}, payload) {

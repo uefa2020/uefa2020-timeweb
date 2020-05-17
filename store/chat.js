@@ -17,6 +17,9 @@ const layoutLeft = {
   },
   content: {
     class: 'text-left'
+  },
+  editButtons: {
+    class: 'justify-start'
   }
 };
 const layoutRight = {
@@ -29,6 +32,9 @@ const layoutRight = {
   },
   content: {
     class: 'text-right'
+  },
+  editButtons: {
+    class: 'justify-end'
   }
 };
 
@@ -104,7 +110,7 @@ export const mutations = {
       if (i < 0) {
         payload.layout = layoutLeft
       } else {
-        const message = state.messages[i];
+        let message = state.messages[i];
 
         if (payload.fromId == message.fromId) {
           payload.layout = message.layout
@@ -119,8 +125,16 @@ export const mutations = {
     state.messages.push(payload)
   },
   UPDATE_MESSAGE(state, payload) {
-
-  }
+    const idx = state.messages.findIndex(el => (
+      el.fromId == payload.fromId && this.$moment(el.date).format('YYYY-MM-DD HH:mm:ss') == payload.date
+    ));
+    state.messages[idx].message = payload.message
+  },
+  DELETE_MESSAGE(state, payload) {
+    state.messages = state.messages.filter(
+      el => !(el.fromId == payload.fromId && el.date == payload.date)
+    );
+  },
 };
 
 export const actions = {
@@ -176,6 +190,7 @@ export const actions = {
 
       const data = await this.$axios.$get('/api/chat/saveMessage', {
         params: {
+          date: this.$moment(payload.date).format('YYYY-MM-DD HH:mm:ss'),
           from: payload.fromId,
           to: payload.to,
           message: payload.message
@@ -198,13 +213,13 @@ export const actions = {
   },
 
   async updateMessage({commit}, payload) {
-    /*try {
+    try {
       await commit('common/CLEAR_MESSAGE', null, {root: true});
 
       const data = await this.$axios.$get('/api/chat/updateMessage', {
         params: {
-          from: payload.fromId,
-          to: payload.to,
+          fromId: payload.fromId,
+          date: payload.date,
           message: payload.message
         }
       });
@@ -216,11 +231,38 @@ export const actions = {
         }, {root: true});
       }
     } catch (e) {
-      console.log('Error saveMessage:', e);
+      console.log('Error updateMessage:', e);
       await commit('common/SET_MESSAGE', {
         status: 'error',
-        text: 'Ошибка при выполнении saveMessage (см. в консоли ошибку "Error saveMessage")'
+        text: 'Ошибка при выполнении updateMessage (см. в консоли ошибку "Error updateMessage")'
       }, {root: true});
-    }*/
+    }
+  },
+
+  async deleteMessage({commit}, payload) {
+    try {
+      await commit('common/CLEAR_MESSAGE', null, {root: true});
+
+      const data = await this.$axios.$get('/api/chat/deleteMessage', {
+        params: {
+          fromId: payload.fromId,
+          date: this.$moment(payload.date).format('YYYY-MM-DD HH:mm:ss')
+        }
+      });
+
+      if (data.error) {
+        await commit('common/SET_MESSAGE', {
+          status: 'error',
+          text: data.error
+        }, {root: true});
+      }
+    } catch (e) {
+      console.log('Error deleteMessage:', e);
+      await commit('common/SET_MESSAGE', {
+        status: 'error',
+        text: 'Ошибка при выполнении deleteMessage (см. в консоли ошибку "Error deleteMessage")'
+      }, {root: true});
+    }
   }
-}
+};
+

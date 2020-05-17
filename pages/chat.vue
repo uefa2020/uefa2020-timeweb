@@ -1,6 +1,8 @@
 <template>
   <div class="d-flex flex-column" :style="{width: '100%', height: heightMessages}">
-    <div class="d-flex flex-row mb-3 py-1 pr-1" :style="{borderBottom: '2px solid grey'}">
+    <mu-dialog-delete-message v-model="dialog" :message="messageToDialog" @deleteMessage="deleteMessage" />
+
+    <div class="d-flex flex-row my-2 pb-1 pr-1" :style="{borderBottom: '2px solid grey'}">
       <v-col class="pa-1" cols="6">
         <h3 class="ml-5">
           {{gamblers.length > 1 ? 'Сейчас в чате:' : 'Сейчас в чате никого нет'}}
@@ -19,18 +21,30 @@
 
       <v-col cols="6" class="pa-1 d-flex flex-column">
         <v-textarea
+          class="message"
           v-model="text"
           label="Текст сообщения"
+          placeholder="Комбинация клавиш для отправки сообщения - Ctrl+Enter"
           hide-details
           outlined
           :rows="rows"
-          prepend-inner-icon="fas fa-comment-dots"
+          prepend-icon="far fa-comment-dots"
+          @keyup.ctrl.enter="sendMessage"
         />
 
-        <v-btn small class="mt-2 ml-auto" color="primary" @click="sendMessage()">
-          Отправить
-          <v-icon right>far fa-share-square</v-icon>
-        </v-btn>
+        <div class="mt-2 d-flex">
+          <v-btn v-if="message" small color="error" @click="cancel">
+            Отмена
+            <v-icon right>fas fa-times</v-icon>
+          </v-btn>
+
+          <v-spacer/>
+
+          <v-btn small color="primary" @click="sendMessage">
+            Отправить
+            <v-icon right>far fa-share-square</v-icon>
+          </v-btn>
+        </div>
       </v-col>
     </div>
 
@@ -77,7 +91,27 @@
                 {{message.fromNick}}
               </v-list-item-subtitle>
 
-              <v-list-item-title v-html="message.message" @click="editMessage(message)"/>
+              <div v-if="message.fromId == getGambler.id" class="d-flex" :class="message.layout.editButtons.class">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{on}">
+                    <v-btn icon x-small color="pink" v-on="on" @click="openDialog(message)">
+                      <v-icon size="15">fas fa-trash-alt</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Удалить</span>
+                </v-tooltip>
+
+                <v-tooltip bottom>
+                  <template v-slot:activator="{on}">
+                    <v-btn icon x-small color="indigo" v-on="on" @click="editMessage(message)">
+                      <v-icon size="15">fas fa-pencil-alt</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Редактировать</span>
+                </v-tooltip>
+              </div>
+
+              <v-list-item-title v-html="message.message"/>
             </v-list-item-content>
           </v-list-item>
         </v-list>
@@ -87,6 +121,8 @@
 </template>
 
 <script>
+  import MuDialogDeleteMessage from '~/components/DialogDeleteMessage'
+
   import {mapGetters} from 'vuex'
 
   export default {
@@ -97,9 +133,14 @@
     },
     data() {
       return {
+        dialog: false,
+        messageToDialog: null,
         message: null,
         text: ''
       }
+    },
+    components: {
+      MuDialogDeleteMessage
     },
     mounted() {
       setTimeout(() => {
@@ -129,7 +170,7 @@
         switch (this.$vuetify.breakpoint.name) {
           case 'xl':
           case 'lg':
-            rows = 2;
+            rows = 3;
             break;
           case 'md':
             rows = 3;
@@ -187,15 +228,37 @@
       }
     },
     methods: {
+      openDialog(message) {
+        this.messageToDialog = message
+        this.dialog = true;
+      },
+      async deleteMessage(data) {
+        this.dialog = false;
+
+        if (data.delete) {
+          this.messageToDialog = null;
+          await this.$socket.emit('deleteMessage', data.message)
+        }
+      },
       editMessage(message) {
-        this.message = message;
+        this.message = {...message};
         this.text = message.message.replace(/<br\/>/g, '\n')
       },
-      async sendMessage() {
+      /*async deleteMessage(message) {
+        await this.$socket.emit('deleteMessage', message)
+      },*/
+      cancel() {
+        this.message = null;
+        this.text = ''
+      },
+      async sendMessage(event) {
+        if (!this.text.trim()) return;
+
         if (this.message) {
           this.message.message = this.text.replace(/([^>])\n/g, '$1<br/>')
+          this.message.date = this.$moment(this.message.date).format('YYYY-MM-DD HH:mm:ss')
 
-          await this.$socket.emit('editMessage', message);
+          await this.$socket.emit('editMessage', this.message);
 
           this.message = null
         } else {
@@ -210,7 +273,8 @@
           await this.$socket.emit('newMessage', message);
         }
 
-        this.message = ''
+        this.text = '';
+        event.target.blur()
       }
     }
   }
@@ -219,6 +283,9 @@
 <style lang="scss">
   .v-textarea textarea {
     line-height: normal !important;
+  }
+  .message .v-icon.v-icon {
+    color: #1976d2 !important
   }
 </style>
 

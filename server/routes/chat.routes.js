@@ -8,5 +8,6 @@ router.get('/loadGamblers', chat.loadGamblers);
 router.get('/loadMessages', chat.loadMessages);
 router.get('/saveMessage', chat.saveMessage);
 router.get('/updateMessage', chat.updateMessage);
+router.get('/deleteMessage', chat.deleteMessage);
 
 module.exports = router;

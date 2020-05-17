@@ -38,6 +38,7 @@ io.on('connection', (socket) => {
       fromNick: 'администратор',
       photo: '',
       to: room,
+      date: Date.now(),
       message: `${data.nickname} ${data.sex === 'м' ? 'вошёл' : 'вошла'} в приложение`
     };
 
@@ -49,8 +50,9 @@ io.on('connection', (socket) => {
   });
 
   socket.on('newMessage', data => {
-    socket.emit('messageToDB', data);
+    data.date = Date.now();
 
+    socket.emit('messageToDB', data);
     io.to(room).emit('sendMessage', data);
   });
 
@@ -58,6 +60,12 @@ io.on('connection', (socket) => {
     socket.emit('messageUpdateDB', data);
 
     io.to(room).emit('updateMessage', data);
+  });
+
+  socket.on('deleteMessage', data => {
+    socket.emit('messageDeleteDB', data);
+
+    io.to(room).emit('deleteMessage', data);
   });
 
   /*socket.on('reload', data => {
@@ -89,6 +97,7 @@ io.on('connection', (socket) => {
       fromId: 0,
       fromNick: 'администратор',
       to: room,
+      date: Date.now(),
       message: `${data.nickname} ${data.sex === 'м' ? 'вышёл' : 'вышла'} из приложения`
     };
 
@@ -97,7 +106,7 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('setMessage', {status: 'primary', text: message.message});
   });
 
-  socket.on('disconnect', (reason) => {
+  /*socket.on('disconnect', (reason) => {
     io.of('/').clients((error, clients) => {
       if (error) throw error;
 
@@ -105,7 +114,7 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('update', {sockets: clients, id: gamblerId})
       }
     });
-  })
+  })*/
 });
 
 module.exports = {app, server};
