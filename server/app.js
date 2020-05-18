@@ -25,6 +25,7 @@ io.on('connection', (socket) => {
   socket.join(room); //Если будет несколько "комнат", то, наверное, правильнее подключаться к ней
                      //внутри прослушивания конкретного события
 
+  /****************************************************************************/
   socket.on('login', data => {
     gamblerId = data.id;
     data.socket_id = socketId;
@@ -49,6 +50,7 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('setMessage', {status: 'primary', text: message.message})
   });
 
+  /****************************************************************************/
   socket.on('newMessage', data => {
     data.date = Date.now();
 
@@ -56,18 +58,21 @@ io.on('connection', (socket) => {
     io.to(room).emit('sendMessage', data);
   });
 
+  /****************************************************************************/
   socket.on('editMessage', data => {
     socket.emit('messageUpdateDB', data);
 
     io.to(room).emit('updateMessage', data);
   });
 
+  /****************************************************************************/
   socket.on('deleteMessage', data => {
     socket.emit('messageDeleteDB', data);
 
     io.to(room).emit('deleteMessage', data);
   });
 
+  /****************************************************************************/
   /*socket.on('reload', data => {
     console.log('socket-reload');
     data.socket_id = socketId;
@@ -77,6 +82,7 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('addToChat', data);
   });*/
 
+  /****************************************************************************/
   /*socket.on('chat', data => {
     gamblerId = data.id;
     data.socket_id = socketId;
@@ -86,10 +92,12 @@ io.on('connection', (socket) => {
     io.to(room).emit('addToChat', data);
   });*/
 
+  /****************************************************************************/
   socket.on('changeProfile', data => {
     socket.broadcast.emit('changeProfile', data);
   });
 
+  /****************************************************************************/
   socket.on('logout', data => {
     io.to(room).emit('logout', data);
 
@@ -106,6 +114,7 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('setMessage', {status: 'primary', text: message.message});
   });
 
+  /****************************************************************************/
   /*socket.on('disconnect', (reason) => {
     io.of('/').clients((error, clients) => {
       if (error) throw error;

@@ -1,8 +1,8 @@
 <template>
-  <div class="d-flex flex-column" :style="{width: '100%', height: heightMessages}">
-    <mu-dialog-delete-message v-model="dialog" :message="messageToDialog" @deleteMessage="deleteMessage" />
+  <div class="d-flex flex-column" :style="{width: '100%', height: '100%'}">
+    <mu-dialog-delete-message v-model="dialog" :message="messageToDialog" @deleteMessage="deleteMessage"/>
 
-    <div class="d-flex flex-row my-2 pb-1 pr-1" :style="{borderBottom: '2px solid grey'}">
+    <div ref="top" class="d-flex flex-row mt-2 pb-1 pr-1" :style="{borderBottom: '2px solid purple'}">
       <v-col class="pa-1" cols="6">
         <h3 class="ml-5">
           {{gamblers.length > 1 ? 'Сейчас в чате:' : 'Сейчас в чате никого нет'}}
@@ -21,7 +21,7 @@
 
       <v-col cols="6" class="pa-1 d-flex flex-column">
         <v-textarea
-          class="message"
+          class="message mb-1"
           v-model="text"
           label="Текст сообщения"
           placeholder="Комбинация клавиш для отправки сообщения - Ctrl+Enter"
@@ -32,15 +32,19 @@
           @keyup.ctrl.enter="sendMessage"
         />
 
-        <div class="mt-2 d-flex">
-          <v-btn v-if="message" small color="error" @click="cancel">
+        <div v-if="emptyMessage" class="empty-message error--text ml-8 mb-1 caption" :style="{lineHeight: 'normal'}">
+          Нельзя отправить пустое сообщение
+        </div>
+
+        <div class="d-flex">
+          <v-btn v-if="message" class="ml-8" small color="error" @click="cancel">
             Отмена
             <v-icon right>fas fa-times</v-icon>
           </v-btn>
 
           <v-spacer/>
 
-          <v-btn small color="primary" @click="sendMessage">
+          <v-btn small color="info" @click="sendMessage">
             Отправить
             <v-icon right>far fa-share-square</v-icon>
           </v-btn>
@@ -48,7 +52,36 @@
       </v-col>
     </div>
 
-    <div ref="chat" :style="{height: '100%', overflowY: 'auto'}">
+    <div ref="params" :style="{borderBottom: '2px solid purple !important'}">
+      <v-card flat color="purple lighten-5">
+        <v-card-actions class="pt-0">
+          <v-radio-group class="mt-0" row hide-details v-model="range">
+            <v-radio
+              class="range"
+              color="purple"
+              v-for="item in rangeMessages"
+              :key="item.value"
+              :label="item.label"
+              :value="item.value"
+              @change="range = item.value, changeParams()"
+            />
+          </v-radio-group>
+
+          <v-spacer/>
+
+          <v-checkbox
+            class="systemMessages mt-0"
+            color="purple"
+            hide-details
+            v-model="systemMessages"
+            label="Показывать системные сообщения"
+            @change="setShowSystem = !getShowSystem, changeParams()"
+          />
+        </v-card-actions>
+      </v-card>
+    </div>
+
+    <div ref="chat" :style="{maxHeight: `calc(100vh - ${maxHeight})`, overflowY: 'auto'}">
       <v-card
         flat
         :width="widthMessages"
@@ -84,12 +117,13 @@
               :class="message.layout.content.class"
             >
               <v-list-item-subtitle :style="{whiteSpace: 'normal !important'}">
-                {{$moment(message.date).format('DD.MM.YYYY HH:mm:ss')}}
+                <span class="mr-2">{{$moment(message.date).format('DD.MM.YYYY HH:mm:ss')}}</span>
+                <b>{{message.fromNick}}</b>
               </v-list-item-subtitle>
 
-              <v-list-item-subtitle>
+              <!--<v-list-item-subtitle>
                 {{message.fromNick}}
-              </v-list-item-subtitle>
+              </v-list-item-subtitle>-->
 
               <div v-if="message.fromId == getGambler.id" class="d-flex" :class="message.layout.editButtons.class">
                 <v-tooltip bottom>
@@ -123,26 +157,46 @@
 <script>
   import MuDialogDeleteMessage from '~/components/DialogDeleteMessage'
 
-  import {mapGetters} from 'vuex'
+  import {mapGetters, mapMutations, mapActions} from 'vuex'
 
   export default {
     name: 'chat',
     async asyncData({store}) {
       await store.dispatch('chat/loadGamblers');
-      await store.dispatch('chat/loadMessages')
+      await store.dispatch('chat/loadMessages', {range: 1, system: false})
     },
     data() {
       return {
         dialog: false,
         messageToDialog: null,
         message: null,
-        text: ''
+        text: '',
+        rangeMessages: [
+          {
+            label: 'Вчера/Позавчера',
+            value: 1
+          },
+          {
+            label: 'За неделю',
+            value: 7
+          },
+          {
+            label: 'Все',
+            value: 0
+          },
+        ],
+        emptyMessage: false,
+        systemMessages: this.getShowSystem,
+        range: 1,
+        maxHeight: 0
       }
     },
     components: {
       MuDialogDeleteMessage
     },
     mounted() {
+      /*this.loadMessages({range: this.range, system: this.systemMessages});*/
+
       setTimeout(() => {
         this.$refs.chat.scrollTop = this.$refs.chat.scrollHeight
       })
@@ -154,7 +208,8 @@
       ...mapGetters({
         getGamblers: 'chat/getGamblers',
         getMessages: 'chat/getMessages',
-        getGambler: 'gambler/getGambler'
+        getGambler: 'gambler/getGambler',
+        getShowSystem: 'chat/getShowSystem',
       }),
       currentGambler() {
         return this.getGambler
@@ -189,7 +244,7 @@
         switch (this.$vuetify.breakpoint.name) {
           case 'xl':
           case 'lg':
-            width = '70%';
+            width = '65%';
             break;
           case 'md':
             width = '85%';
@@ -200,34 +255,25 @@
 
         return width
       },
-      heightMessages() {
-        let height = '88vh';
-        switch (this.$vuetify.breakpoint.name) {
-          case 'xl':
-          case 'lg':
-            height = '88vh';
-            break;
-          case 'md':
-            height = '85vh';
-            break;
-          case 'sm':
-            height = '82vh';
-            break;
-          default:
-            height = '80vh'
-        }
-
-        return height
-      }
     },
     watch: {
       messages() {
         setTimeout(() => {
-          this.$refs.chat.scrollTop = this.$refs.chat.scrollHeight
+          this.$refs.chat.scrollTop = this.range === 1 ? this.$refs.chat.scrollHeight : 0
         })
+      },
+      systemMessages() {
+        this.maxHeight = this.$refs.top.clientHeight + this.$refs['params'].clientHeight + 125;
+        this.maxHeight += 'px'
       }
     },
     methods: {
+      ...mapMutations({
+        setShowSystem: 'chat/SET_SHOW_SYSTEM'
+      }),
+      ...mapActions({
+        loadMessages: 'chat/loadMessages'
+      }),
       openDialog(message) {
         this.messageToDialog = message
         this.dialog = true;
@@ -241,6 +287,8 @@
         }
       },
       editMessage(message) {
+        this.emptyMessage = false;
+
         this.message = {...message};
         this.text = message.message.replace(/<br\/>/g, '\n')
       },
@@ -248,11 +296,21 @@
         await this.$socket.emit('deleteMessage', message)
       },*/
       cancel() {
+        this.emptyMessage = false;
         this.message = null;
         this.text = ''
       },
+      async changeParams() {
+        await this.loadMessages({
+          range: this.range,
+          system: this.systemMessages
+        })
+      },
       async sendMessage(event) {
-        if (!this.text.trim()) return;
+        if (!this.text.trim()) {
+          this.emptyMessage = true;
+          return
+        };
 
         if (this.message) {
           this.message.message = this.text.replace(/([^>])\n/g, '$1<br/>')
@@ -274,18 +332,25 @@
         }
 
         this.text = '';
-        event.target.blur()
+        this.emptyMessage = false;
+        //event.target.blur()
       }
     }
   }
 </script>
 
 <style lang="scss">
-  .v-textarea textarea {
+  .message.v-textarea textarea {
     line-height: normal !important;
   }
+
   .message .v-icon.v-icon {
     color: #1976d2 !important
+  }
+
+  .range .v-label,
+  .systemMessages .v-label {
+    color: purple !important
   }
 </style>
 

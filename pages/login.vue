@@ -106,7 +106,7 @@
           await this.$router.push('/profile')
         } else if (this.getIsAuth) {
           await this.$socket.emit('login', this.getGambler);
-          await this.$router.push('/gambler')
+          await this.$router.push('/chat')
         }
       }
     }

@@ -40,15 +40,20 @@ const layoutRight = {
 
 export const state = () => ({
   gamblers: [],
-  messages: []
+  messages: [],
+  showSystem: false
 });
 
 export const getters = {
   getGamblers: state => state.gamblers,
-  getMessages: state => state.messages
+  getMessages: state => state.messages,
+  getShowSystem: state => state.showSystem
 };
 
 export const mutations = {
+  SET_SHOW_SYSTEM(state, payload) {
+    state.showSystem = payload
+  },
   LOAD_GAMBLERS(state, payload) {
     state.gamblers = payload
   },
@@ -102,6 +107,8 @@ export const mutations = {
     })
   },
   ADD_MESSAGE(state, payload) {
+    if (!state.showSystem && payload.fromId == 0) return;
+
     if (payload.fromId == 0) {
       payload.layout = layoutAdmin
     } else {
@@ -161,11 +168,16 @@ export const actions = {
     }
   },
 
-  async loadMessages({commit}) {
+  async loadMessages({commit}, payload) {
     try {
       await commit('common/CLEAR_MESSAGE', null, {root: true});
 
-      const data = await this.$axios.$get('/api/chat/loadMessages');
+      const data = await this.$axios.$get('/api/chat/loadMessages', {
+        params: {
+          range: payload.range,
+          system: payload.system
+        }
+      });
 
       if (data.error) {
         await commit('common/SET_MESSAGE', {
