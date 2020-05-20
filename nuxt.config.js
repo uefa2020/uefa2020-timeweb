@@ -3,6 +3,10 @@ const pkg = require('./package');
 module.exports = {
   mode: 'universal',
 
+  server: {
+    host: '192.168.1.64' // default: localhost
+  },
+
   /*
   ** Headers of the page
   */
@@ -32,8 +36,8 @@ module.exports = {
   ** Plugins to load before mounting the App
   */
   plugins: [
-    { src: '~/plugins/vuetify', ssr: false },
-    { src: '~/plugins/socket', ssr: false}
+    {src: '~/plugins/vuetify', ssr: false},
+    {src: '~/plugins/socket', ssr: false}
   ],
 
   /*

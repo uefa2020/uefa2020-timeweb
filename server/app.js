@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const server = require('http').createServer(app);
 const io = require('socket.io')(server);
@@ -8,6 +9,8 @@ const gamblerRoutes = require('./routes/gambler.routes');
 const emailRoutes = require('./routes/email.routes');
 const chatRoutes = require('./routes/chat.routes');
 const imageRoutes = require('./routes/image.routes');
+
+app.use(cors());
 
 app.use('/api/authkey', authkeyRoutes);
 app.use('/api/gambler', gamblerRoutes);
