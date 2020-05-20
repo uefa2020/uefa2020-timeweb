@@ -29,6 +29,7 @@
             light
             color="purple lighten-2"
             v-model="login"
+            autofocus
             :rules="[rules.required]"
           />
 

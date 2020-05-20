@@ -81,7 +81,15 @@
         </v-form>
       </v-card-text>
 
-      <v-card-actions class="justify-center pt-0 pb-3">
+      <v-card-actions class="justify-space-around pt-0 pb-3">
+        <v-btn
+          v-if="!isSign"
+          color="grey lighten-1"
+          @click="cancel"
+        >
+          Отмена
+        </v-btn>
+
         <v-btn
           :loading="loading"
           :disabled="loading"
@@ -97,6 +105,8 @@
 </template>
 
 <script>
+  import {mapGetters, mapActions} from 'vuex'
+
   export default {
     name: 'profile',
     layout({store}) {
@@ -138,14 +148,17 @@
       this.gambler.photo = this.user.photo;
     },
     computed: {
+      ...mapGetters({
+        isAuth: 'gambler/isAuth'
+      }),
       sm() {
-        return (this.$store.getters['gambler/isAuth'] ? '7' : '6')
+        return (this.isAuth ? '7' : '6')
       },
       md() {
-        return (this.$store.getters['gambler/isAuth'] ? '7' : '4')
+        return (this.isAuth ? '7' : '4')
       },
       lg() {
-        return (this.$store.getters['gambler/isAuth'] ? '6' : '3')
+        return (this.isAuth ? '6' : '3')
       },
       iconToolbar() {
         let icon = '';
@@ -165,23 +178,30 @@
       }
     },
     methods: {
+      ...mapActions({
+        profile: 'gambler/profile'
+      }),
+      cancel() {
+        this.$router.push('/chat');
+      },
       async save() {
         if (!this.$refs.form.validate()) return;
 
         this.loading = true;
 
-        await this.$store.dispatch('gambler/profile', {
+        await this.profile({
           gambler: this.gambler,
           file: this.file
         });
 
         this.loading = false;
 
-        if (await this.$store.getters['gambler/isAuth']) {
+        //Если сохранение профиля прошло успешно
+        if (this.isAuth) {
           this.$socket.emit('changeProfile', {
-            nickname: this.gambler.nickname,
-            sex: this.gambler.sex,
-            isSign: this.isSign
+            gambler: this.gambler,
+            isSign: this.isSign // "состояние" игрока при ВХОДЕ в режим редактирования профиля: если isSign, то это первоначальная запись
+                                // данных, иначе - это редактирование уже имеющихся данных
           });
           this.$router.push('/chat')
         }

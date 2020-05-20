@@ -40,22 +40,8 @@ export const actions = {
     }, {root: true});
   },
 
-  async socket_changeProfile({getters, commit, dispatch}, payload) {
+  async socket_loadGamblers({dispatch}) {
     await dispatch('gambler/loadGamblers', null, {root: true});
-
-    const message = (
-      payload.isSign
-        ? `${payload.nickname} ${payload.sex === 'м' ? 'зарегистрировался' : 'зарегистрировалась'} в системе`
-        : `У игрока '${payload.nickname}' обновился профиль`
-    );
-
-    if (payload.nickname !== getters['gambler/getGambler'].nickname) {
-      await commit('common/CLEAR_MESSAGE', null, {root: true});
-      await commit('common/SET_MESSAGE', {
-        status: 'primary',
-        text: message
-      }, {root: true})
-    }
   },
 
   async socket_logout({commit}, payload) {

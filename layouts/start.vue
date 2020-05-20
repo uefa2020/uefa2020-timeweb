@@ -44,6 +44,8 @@
 </template>
 
 <script>
+  import {mapGetters} from 'vuex'
+
   export default {
     name: 'start',
     data() {
@@ -54,14 +56,18 @@
       }
     },
     computed: {
-      isMessage() {
-        return this.$store.getters['common/isMessage'];
+      ...mapGetters({
+        getMessage: 'common/getMessage',
+        isMessage: 'common/isMessage'
+      }),
+      checkMessage() {
+        return this.isMessage;
       }
     },
     watch: {
-      isMessage(isMessage) {
+      checkMessage(isMessage) {
         if (isMessage) {
-          const message = this.$store.getters['common/getMessage'];
+          const message = this.getMessage;
           this.color = message.status;
           this.message = message.text;
           this.snackbar = true

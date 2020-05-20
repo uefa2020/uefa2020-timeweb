@@ -18,7 +18,7 @@
       >
         <v-icon large>fas fa-question-circle</v-icon>
         <div class="ml-3">
-          Вы действительно хотите удалить сообщение '<span v-html="message ? message.message : ''"></span>'?
+          Вы действительно хотите удалить сообщение <b>'<span v-html="message ? message.message : ''"></span>'</b>?
         </div>
       </v-card-text>
 

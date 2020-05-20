@@ -8,7 +8,7 @@
           {{gamblers.length > 1 ? 'Сейчас в чате:' : 'Сейчас в чате никого нет'}}
         </h3>
         <v-chip
-          v-for="(gambler, i) in gamblers"
+          v-for="gambler in gamblers"
           :key="gambler.id"
           v-if="gambler.id !== currentGambler.id"
           class="ml-1 mt-1"
@@ -75,7 +75,7 @@
             hide-details
             v-model="systemMessages"
             label="Показывать системные сообщения"
-            @change="setShowSystem = !getShowSystem, changeParams()"
+            @change="changeParams()"
           />
         </v-card-actions>
       </v-card>
@@ -89,7 +89,7 @@
         class="my-1 mx-auto py-2"
       >
         <v-list
-          v-for="(message, i) in messages"
+          v-for="message in messages"
           :key="message.id"
           :width="message.layout.list.width"
           color="purple lighten-4"
@@ -101,7 +101,7 @@
             :style="{minHeight: '25px', borderBottom: '1px solid grey'}"
           >
             <v-list-item-avatar
-              v-if="message.fromId == 0"
+              v-if="message.fromId === 0"
               width="25%"
               class="my-1 mr-1 justify-end"
             >
@@ -125,7 +125,7 @@
                 {{message.fromNick}}
               </v-list-item-subtitle>-->
 
-              <div v-if="message.fromId == getGambler.id" class="d-flex" :class="message.layout.editButtons.class">
+              <div v-if="message.fromId === getGambler.id" class="d-flex" :class="message.layout.editButtons.class">
                 <v-tooltip bottom>
                   <template v-slot:activator="{on}">
                     <v-btn icon x-small color="pink" v-on="on" @click="openDialog(message)">
@@ -137,7 +137,7 @@
 
                 <v-tooltip bottom>
                   <template v-slot:activator="{on}">
-                    <v-btn icon x-small color="indigo" v-on="on" @click="editMessage(message)">
+                    <v-btn class="ml-1" icon x-small color="indigo" v-on="on" @click="editMessage(message)">
                       <v-icon size="15">fas fa-pencil-alt</v-icon>
                     </v-btn>
                   </template>
@@ -145,7 +145,7 @@
                 </v-tooltip>
               </div>
 
-              <v-list-item-title v-html="message.message"/>
+              <v-list-item-title class="deep-purple--text text--darken-4" v-html="message.message"/>
             </v-list-item-content>
           </v-list-item>
         </v-list>
@@ -198,7 +198,7 @@
       /*this.loadMessages({range: this.range, system: this.systemMessages});*/
 
       setTimeout(() => {
-        this.$refs.chat.scrollTop = this.$refs.chat.scrollHeight
+        this.$refs['chat'].scrollTop = this.$refs['chat'].scrollHeight
       })
     },
     /*mounted() {
@@ -259,7 +259,7 @@
     watch: {
       messages() {
         setTimeout(() => {
-          this.$refs.chat.scrollTop = this.range === 1 ? this.$refs.chat.scrollHeight : 0
+          this.$refs['chat'].scrollTop = this.range === 1 ? this.$refs['chat'].scrollHeight : 0
         })
       },
       systemMessages() {
@@ -275,7 +275,10 @@
         loadMessages: 'chat/loadMessages'
       }),
       openDialog(message) {
+        this.emptyMessage = false;
+
         this.messageToDialog = message
+
         this.dialog = true;
       },
       async deleteMessage(data) {
@@ -283,7 +286,13 @@
 
         if (data.delete) {
           this.messageToDialog = null;
-          await this.$socket.emit('deleteMessage', data.message)
+
+          const gambler = this.getGambler;
+          const message = {...data.message};
+          message.screenMessage =
+            `${gambler.nickname} ${gambler.sex === 'м' ? 'удалил' : 'удалила'} сообщение от ${this.$moment(message.date).format('DD.MM.YYYY HH:mm:ss')}`;
+
+          await this.$socket.emit('deleteMessage', message)
         }
       },
       editMessage(message) {
@@ -301,31 +310,39 @@
         this.text = ''
       },
       async changeParams() {
+        await this.setShowSystem(this.systemMessages);
+
         await this.loadMessages({
           range: this.range,
           system: this.systemMessages
         })
       },
-      async sendMessage(event) {
+      async sendMessage() {
         if (!this.text.trim()) {
           this.emptyMessage = true;
           return
-        };
+        }
 
         if (this.message) {
           this.message.message = this.text.replace(/([^>])\n/g, '$1<br/>')
           this.message.date = this.$moment(this.message.date).format('YYYY-MM-DD HH:mm:ss')
 
+          const gambler = this.getGambler;
+          this.message.screenMessage =
+            `${gambler.nickname} ${gambler.sex === 'м' ? 'обновил' : 'обновила'} сообщение от ${this.$moment(this.message.date).format('DD.MM.YYYY HH:mm:ss')}`;
+
           await this.$socket.emit('editMessage', this.message);
 
           this.message = null
         } else {
+          const gambler = this.getGambler;
           const message = {
-            fromId: this.getGambler.id,
-            fromNick: this.getGambler.nickname,
-            photo: this.getGambler.photo,
+            fromId: gambler.id,
+            fromNick: gambler.nickname,
+            photo: gambler.photo,
             to: 'uefa2020',
-            message: this.text.replace(/([^>])\n/g, '$1<br/>')
+            message: this.text.replace(/([^>])\n/g, '$1<br/>'),
+            screenMessage: `${gambler.nickname} ${gambler.sex === 'м' ? 'прислал' : 'прислала'} сообщение`
           };
 
           await this.$socket.emit('newMessage', message);

@@ -45,7 +45,7 @@ io.on('connection', (socket) => {
 
     socket.emit('messageToDB', message);
 
-    socket.broadcast.emit('sendMessage', message);
+    io.to(room).emit('sendMessage', message);
 
     socket.broadcast.emit('setMessage', {status: 'primary', text: message.message})
   });
@@ -56,6 +56,8 @@ io.on('connection', (socket) => {
 
     socket.emit('messageToDB', data);
     io.to(room).emit('sendMessage', data);
+
+    socket.broadcast.emit('setMessage', {status: 'primary', text: data.screenMessage});
   });
 
   /****************************************************************************/
@@ -63,6 +65,8 @@ io.on('connection', (socket) => {
     socket.emit('messageUpdateDB', data);
 
     io.to(room).emit('updateMessage', data);
+
+    socket.broadcast.emit('setMessage', {status: 'primary', text: data.screenMessage});
   });
 
   /****************************************************************************/
@@ -70,6 +74,8 @@ io.on('connection', (socket) => {
     socket.emit('messageDeleteDB', data);
 
     io.to(room).emit('deleteMessage', data);
+
+    socket.broadcast.emit('setMessage', {status: 'primary', text: data.screenMessage});
   });
 
   /****************************************************************************/
@@ -94,7 +100,31 @@ io.on('connection', (socket) => {
 
   /****************************************************************************/
   socket.on('changeProfile', data => {
-    socket.broadcast.emit('changeProfile', data);
+    gamblerId = data.gambler.id;
+    data.gambler.socket_id = socketId;
+
+    socket.emit('setSocketId', data.gambler);
+
+    socket.broadcast.emit('loadGamblers');
+
+    socket.broadcast.emit('addToChat', data.gambler);
+
+    const message = {
+      fromId: 0,
+      fromNick: 'администратор',
+      photo: '',
+      to: room,
+      date: Date.now(),
+      message: data.isSign
+        ? `${data.gambler.nickname} ${data.gambler.sex === 'м' ? 'зарегистрировался' : 'зарегистрировалась'} в системе`
+        : `${data.gambler.nickname} ${data.gambler.sex === 'м' ? ' обновил' : 'обновила'} свой профиль`
+    };
+
+    socket.emit('messageToDB', message);
+
+    io.to(room).emit('sendMessage', message);
+
+    socket.broadcast.emit('setMessage', {status: 'primary', text: message.message})
   });
 
   /****************************************************************************/

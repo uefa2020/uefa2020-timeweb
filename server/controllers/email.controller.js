@@ -80,7 +80,6 @@ module.exports.sendMail = async (req, res) => {
     if (error) {
       res.json(error)
     } else {
-      console.log('authkey:', authkey);
       const query = 'UPDATE `authkeys` SET `status` = -1 WHERE `status` = 0 AND `key` = ?';
       pool.promise().execute(query, [authkey], function (err, results) {
         if (err) {

@@ -144,11 +144,13 @@ export const actions = {
     let fileName = gambler.photo;
     let data = {};
 
+    // Если добавлен файл с фото, то сохраняем его
     if (!!file) {
       try {
         const fileExt = file.name.substr(file.name.lastIndexOf('.'));
         fileName = `${gambler.id}-${Date.now()}${fileExt}`;
 
+        // Если поле photo уже было заполнено, то удаляем "старый" файл
         if (gambler.photo) {
           await this.$axios('/api/gambler/deletePhoto', {
             params: {
@@ -157,6 +159,7 @@ export const actions = {
           });
         }
 
+        // Сохраняем файл с фото
         const fd = new FormData;
         fd.append('subdir', 'photo');
         fd.append('fileName', fileName);
@@ -172,6 +175,9 @@ export const actions = {
       }
     }
 
+    // Если файл не был выбран (значит он уже был введён ранее)
+    // или запись файла в предыдущем блоке if... прошла успешно,
+    //
     if (!file || data.success) {
       try {
         data = await this.$axios.$get('/api/gambler/profile', {
@@ -181,6 +187,7 @@ export const actions = {
             family: gambler.family,
             name: gambler.name,
             sex: gambler.sex,
+            socket_id: gambler.socket_id,
             fileName: fileName,
           }
         });
