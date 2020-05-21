@@ -3,9 +3,10 @@ const pkg = require('./package');
 module.exports = {
   mode: 'universal',
 
-  /*server: {
-    host: '192.168.1.64' // default: localhost
-  },*/
+  server: {
+    port: 8080,
+    host: '89.223.122.221' // default: localhost
+  },
 
   /*
   ** Headers of the page
