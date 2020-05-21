@@ -263,9 +263,13 @@ export const actions = {
   },
 
   async autoLogin({commit, dispatch}) {
-    const cookieStr = process.browser
+    /*const cookieStr = process.browser
       ? document.cookie
-      : this.app.context.req.headers.cookie;
+      : this.app.req.headers.cookie;*/
+
+    const cookieStr = process.server
+      ? this.app.cookie
+      : document.cookie;
 
     const cookies = Cookie.parse(cookieStr || '') || {};
     const token = cookies['uefa2020-jwt-token'];
