@@ -1,5 +1,5 @@
 export const actions = {
-  async nuxtServerInit({dispatch, getters}) {
+  async nuxtServerInit({dispatch}) {
     await dispatch('gambler/autoLogin');
     await dispatch('gambler/loadGamblers');
   },
@@ -42,6 +42,10 @@ export const actions = {
 
   async socket_loadGamblers({dispatch}) {
     await dispatch('gambler/loadGamblers', null, {root: true});
+  },
+
+  async socket_loadMessages({dispatch}, payload) {
+    await dispatch('chat/loadMessages', payload, {root: true});
   },
 
   async socket_logout({commit}, payload) {

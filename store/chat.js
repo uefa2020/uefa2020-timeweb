@@ -68,7 +68,7 @@ export const mutations = {
         const nickname1 = a.nickname.toUpperCase();
         const nickname2 = b.nickname.toUpperCase();
 
-        let result = 0;
+        let result;
 
         if (nickname1 > nickname2) {
           result = 1;
@@ -86,16 +86,13 @@ export const mutations = {
   DELETE_GAMBLER_BY_SOCKET(state, payload) {
     state.gamblers = state.gamblers.filter(el => payload.indexOf(el.socket_id) >= 0);
   },
-  CLEAR_GAMBLERS(state) {
-    state.gamblers = []
-  },
   LOAD_MESSAGES(state, payload) {
     state.messages = payload.map((item, i, arr) => {
-      if (item.fromId == 0) {
+      if (item.fromId === 0) {
         item.layout = layoutAdmin
-      } else if (i === 0 || arr[i - 1].fromId == 0) {
+      } else if (i === 0 || arr[i - 1].fromId === 0) {
         item.layout = layoutLeft
-      } else if (arr[i - 1].fromId == item.fromId) {
+      } else if (arr[i - 1].fromId === item.fromId) {
         item.layout = arr[i - 1].layout
       } else if (arr[i - 1].layout.list.class === 'mr-auto') {
         item.layout = layoutRight
@@ -107,9 +104,9 @@ export const mutations = {
     })
   },
   ADD_MESSAGE(state, payload) {
-    if (!state.showSystem && payload.fromId == 0) return;
+    if (!state.showSystem && payload.fromId === 0) return;
 
-    if (payload.fromId == 0) {
+    if (payload.fromId === 0) {
       payload.layout = layoutAdmin
     } else {
       const i = state.messages.length - 1;
@@ -119,7 +116,7 @@ export const mutations = {
       } else {
         let message = state.messages[i];
 
-        if (payload.fromId == message.fromId) {
+        if (payload.fromId === message.fromId) {
           payload.layout = message.layout
         } else if (message.layout.list.class === 'mr-auto') {
           payload.layout = layoutRight
@@ -133,13 +130,13 @@ export const mutations = {
   },
   UPDATE_MESSAGE(state, payload) {
     const idx = state.messages.findIndex(el => (
-      el.fromId == payload.fromId && this.$moment(el.date).format('YYYY-MM-DD HH:mm:ss') == payload.date
+      el.fromId === payload.fromId && this.$moment(el.date).format('YYYY-MM-DD HH:mm:ss') === payload.date
     ));
     state.messages[idx].message = payload.message
   },
   DELETE_MESSAGE(state, payload) {
     state.messages = state.messages.filter(
-      el => !(el.fromId == payload.fromId && el.date == payload.date)
+      el => !(el.fromId === payload.fromId && el.date === payload.date)
     );
   },
 };
@@ -168,14 +165,14 @@ export const actions = {
     }
   },
 
-  async loadMessages({commit}, payload) {
+  async loadMessages({getters, commit}, payload) {
     try {
       await commit('common/CLEAR_MESSAGE', null, {root: true});
 
       const data = await this.$axios.$get('/api/chat/loadMessages', {
         params: {
           range: payload.range,
-          system: payload.system
+          system: payload.system || getters.getShowSystem
         }
       });
 

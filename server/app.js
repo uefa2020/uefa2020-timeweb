@@ -82,26 +82,6 @@ io.on('connection', (socket) => {
   });
 
   /****************************************************************************/
-  /*socket.on('reload', data => {
-    console.log('socket-reload');
-    data.socket_id = socketId;
-
-    socket.emit('setSocketId', data);
-
-    socket.broadcast.emit('addToChat', data);
-  });*/
-
-  /****************************************************************************/
-  /*socket.on('chat', data => {
-    gamblerId = data.id;
-    data.socket_id = socketId;
-
-    socket.emit('setSocketId', data);
-
-    io.to(room).emit('addToChat', data);
-  });*/
-
-  /****************************************************************************/
   socket.on('changeProfile', data => {
     gamblerId = data.gambler.id;
     data.gambler.socket_id = socketId;
@@ -109,8 +89,8 @@ io.on('connection', (socket) => {
     socket.emit('setSocketId', data.gambler);
 
     socket.broadcast.emit('loadGamblers');
-
     socket.broadcast.emit('addToChat', data.gambler);
+    socket.broadcast.emit('loadMessages', {range: 1});
 
     const message = {
       fromId: 0,
@@ -146,6 +126,26 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('sendMessage', message);
     socket.broadcast.emit('setMessage', {status: 'primary', text: message.message});
   });
+
+  /****************************************************************************/
+  /*socket.on('reload', data => {
+    console.log('socket-reload');
+    data.socket_id = socketId;
+
+    socket.emit('setSocketId', data);
+
+    socket.broadcast.emit('addToChat', data);
+  });*/
+
+  /****************************************************************************/
+  /*socket.on('chat', data => {
+    gamblerId = data.id;
+    data.socket_id = socketId;
+
+    socket.emit('setSocketId', data);
+
+    io.to(room).emit('addToChat', data);
+  });*/
 
   /****************************************************************************/
   /*socket.on('disconnect', (reason) => {

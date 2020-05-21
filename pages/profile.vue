@@ -57,16 +57,16 @@
             </v-col>
 
             <v-col v-if="gambler.photo" cols="auto" class="py-0">
-              <v-img width="50" height="67" :src="`/photo/${gambler.photo}`"/>
+              <v-img width="50" height="67" :src="`/phot//${gambler.photo}`" />
             </v-col>
           </v-row>
 
           <div>
             <v-file-input
-              :rules="[rules.image, this.$store.getters['gambler/isSign'] ? rules.required : true]"
+              :rules="[rules.image, this.isSign ? rules.required : true]"
               accept="image/png, image/jpeg"
               prepend-icon="fas fa-camera-retro"
-              :label="this.$store.getters['gambler/isSign'] ? 'Фото участника' : 'Заменить фото'"
+              :label="this.isSign ? 'Фото участника' : 'Заменить фото'"
               show-size
               v-model="file"
             />
@@ -83,7 +83,7 @@
 
       <v-card-actions class="justify-space-around pt-0 pb-3">
         <v-btn
-          v-if="!isSign"
+          v-if="!this.isSign"
           color="grey lighten-1"
           @click="cancel"
         >
@@ -149,7 +149,8 @@
     },
     computed: {
       ...mapGetters({
-        isAuth: 'gambler/isAuth'
+        isAuth: 'gambler/isAuth',
+        getGambler: 'gambler/getGambler'
       }),
       sm() {
         return (this.isAuth ? '7' : '6')
@@ -199,11 +200,11 @@
         //Если сохранение профиля прошло успешно
         if (this.isAuth) {
           this.$socket.emit('changeProfile', {
-            gambler: this.gambler,
+            gambler: this.getGambler,
             isSign: this.isSign // "состояние" игрока при ВХОДЕ в режим редактирования профиля: если isSign, то это первоначальная запись
                                 // данных, иначе - это редактирование уже имеющихся данных
           });
-          this.$router.push('/chat')
+          await this.$router.push('/chat')
         }
       }
     }

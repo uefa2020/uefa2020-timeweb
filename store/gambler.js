@@ -12,7 +12,6 @@ export const getters = {
   getGambler: state => state.gambler,
   isSign: state => (!!state.gambler && (state.gambler.status === 0)),
   isAuth: state => (!!state.gambler && (state.gambler.status > 0)),
-  isAdmin: state => (!!state.gambler ? state.gambler.admin : false),
   getGamblers: state => state.gamblers,
   getGamblersOrderByNick: state => state.gamblers.slice().sort((a, b) => {
     // Используем toUpperCase() для преобразования регистра
@@ -21,7 +20,8 @@ export const getters = {
     const name1 = a.name.toUpperCase();
     const name2 = b.name.toUpperCase();
 
-    let result = 0;
+    let result;
+
     if (family1 > family2) {
       result = 1;
     } else if (family1 < family2) {
@@ -34,8 +34,7 @@ export const getters = {
       }
     }
     return result;
-  }),
-  getToken: state => state.token
+  })
 };
 
 export const mutations = {

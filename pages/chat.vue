@@ -36,18 +36,35 @@
           Нельзя отправить пустое сообщение
         </div>
 
-        <div class="d-flex">
-          <v-btn v-if="message" class="ml-8" small color="error" @click="cancel">
+        <div class="d-flex justify-space-around">
+          <v-tooltip v-if="message" bottom>
+            <template v-slot:activator="{on}">
+              <v-btn  v-if="message" x-small color="error" v-on="on" @click="cancel">
+                <v-icon size="14">fas fa-ban</v-icon>
+              </v-btn>
+            </template>
+            <span>Отмена</span>
+          </v-tooltip>
+
+          <!--<v-btn v-if="message" class="ml-8" small color="error" @click="cancel">
             Отмена
             <v-icon right>fas fa-times</v-icon>
-          </v-btn>
+          </v-btn>-->
 
-          <v-spacer/>
+          <!--<v-spacer/>-->
 
-          <v-btn small color="info" @click="sendMessage">
+          <v-tooltip bottom>
+            <template v-slot:activator="{on}">
+              <v-btn x-small color="info" v-on="on" @click="sendMessage">
+                <v-icon size="15">fas fa-share</v-icon>
+              </v-btn>
+            </template>
+            <span>Отправить</span>
+          </v-tooltip>
+          <!--<v-btn small color="info" @click="sendMessage">
             Отправить
             <v-icon right>far fa-share-square</v-icon>
-          </v-btn>
+          </v-btn>-->
         </div>
       </v-col>
     </div>
