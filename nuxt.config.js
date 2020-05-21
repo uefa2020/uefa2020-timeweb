@@ -3,9 +3,9 @@ const pkg = require('./package');
 module.exports = {
   mode: 'universal',
 
-  server: {
+  /*server: {
     host: '192.168.1.64' // default: localhost
-  },
+  },*/
 
   /*
   ** Headers of the page
