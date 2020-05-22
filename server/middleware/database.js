@@ -2,7 +2,7 @@ const mysql = require('mysql2');
 
 const pool = mysql.createPool({
   //connectionLimit: 10,
-  host: 'localhost',
+  host: (process.env.NOD_ENV === 'production' ? '89.223.122.221' : 'localhost'),
   user: 'root',
   password: 'root',
   database: 'uefa2020',
