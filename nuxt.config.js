@@ -5,7 +5,7 @@ module.exports = {
 
   server: {
     port: (process.env.NODE_ENV === 'production' ? 8080 : 3000),
-    host: (process.env.NOD_ENV === 'production' ? '89.223.122.221' : 'localhost')
+    //host: (process.env.NOD_ENV === 'production' ? '89.223.122.221' : 'localhost')
   },
 
   /*
