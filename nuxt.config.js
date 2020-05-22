@@ -3,12 +3,12 @@ const pkg = require('./package');
 module.exports = {
   mode: 'universal',
 
-  /*server: {
+  server: {
     //port: (process.env.NODE_ENV === 'production' ? 8080 : 3000),
     //host: (process.env.NOD_ENV === 'production' ? '89.223.122.221' : 'localhost')
-    //port: 8080,
+    port: '0',
     host: '89.223.122.221'
-  },*/
+  },
 
   /*
   ** Headers of the page
