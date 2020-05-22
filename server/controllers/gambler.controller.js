@@ -43,9 +43,9 @@ module.exports.signup = async (req, res) => {
             {expiresIn: 60 * 60 * 8} // 8 часов будет "жить" токен
           );
 
-          res.json({gambler, token})
+          await res.json({gambler, token})
         } else {
-          res.json({error: 'Ошибка регистрации'})
+          await res.json({error: 'Ошибка регистрации'})
         }
       })
       .catch((e) => {

@@ -69,13 +69,13 @@ export const mutations = {
 export const actions = {
   async setToken({commit}, payload) {
     await this.$axios.setToken(payload, 'Bearer');
-    commit('SET_TOKEN', payload);
+    await commit('SET_TOKEN', payload);
     Cookies.set('uefa2020-jwt-token', payload)
   },
 
   async clearToken({commit}) {
     await this.$axios.setToken(false);
-    commit('CLEAR_TOKEN');
+    await commit('CLEAR_TOKEN');
     Cookies.remove('uefa2020-jwt-token');
   },
 
@@ -95,8 +95,8 @@ export const actions = {
           text: data.error
         }, {root: true});
       } else {
-        commit('SET_GAMBLER', data.gambler);
-        dispatch('setToken', data.token)
+        await commit('SET_GAMBLER', data.gambler);
+        await dispatch('setToken', data.token)
       }
     } catch (e) {
       console.log('Error signup:', e);
@@ -267,11 +267,13 @@ export const actions = {
       ? document.cookie
       : this.app.req.headers.cookie;*/
 
-    const cookieStr = process.server
-      ? this.app.cookie
-      : document.cookie;
+    /*const cookies = Cookie.parse(cookieStr || '') || {};
+    const token = cookies['uefa2020-jwt-token'];*/
 
-    const cookies = Cookie.parse(cookieStr || '') || {};
+    const cookies = process.server
+      ? this.app.$cookies.getAll()
+      : this.$cookies.getAll();
+
     const token = cookies['uefa2020-jwt-token'];
 
     if (token) {
