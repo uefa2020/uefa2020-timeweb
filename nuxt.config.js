@@ -6,8 +6,8 @@ module.exports = {
   /*server: {
     //port: (process.env.NODE_ENV === 'production' ? 8080 : 3000),
     //host: (process.env.NOD_ENV === 'production' ? '89.223.122.221' : 'localhost')
-    port: '0',
-    host: '89.223.122.221'
+    //port: '0',
+    //host: '192.168.1.64'
   },*/
 
   /*
