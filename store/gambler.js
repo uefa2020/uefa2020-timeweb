@@ -48,20 +48,23 @@ export const mutations = {
     state.token = null
   },
   LOAD_GAMBLERS(state, payload) {
-    payload.reduce(function (obj, item, i, payload) {
-      if (i === 0) {
-        obj.count = 1
-      } else if (payload[i - 1].points === payload[i].points) {
-        obj.count++
-      } else {
-        obj.place += obj.count;
-        obj.count = 1
-      }
+    if (payload.length > 0) {
+      payload.reduce(function (obj, item, i, payload) {
+        if (i === 0) {
+          obj.count = 1
+        } else if (payload[i - 1].points === payload[i].points) {
+          obj.count++
+        } else {
+          obj.place += obj.count;
+          obj.count = 1
+        }
 
-      payload[i].place = obj.place;
+        payload[i].place = obj.place;
 
-      return obj
-    }, {place: 1, count: 1});
+        return obj
+      }, {place: 1, count: 1});
+    }
+
     state.gamblers = payload
   },
 };
