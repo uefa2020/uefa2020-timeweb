@@ -190,7 +190,7 @@
         text: '',
         rangeMessages: [
           {
-            label: 'Вчера/Позавчера',
+            label: 'Сегодня/Вчера',
             value: 1
           },
           {
