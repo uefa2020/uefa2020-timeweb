@@ -57,7 +57,7 @@
             </v-col>
 
             <v-col v-if="gambler.photo" cols="auto" class="py-0">
-              <v-img width="50" height="67" :src="`/phot//${gambler.photo}`" />
+              <v-img width="50" height="67" :src="`/photo/${gambler.photo}`" />
             </v-col>
           </v-row>
 
