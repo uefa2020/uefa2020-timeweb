@@ -20,34 +20,57 @@
 
       <v-card-text class="py-1">
         <v-form ref="form" lazy-validation>
-          <v-text-field
-            label="Ник"
-            name="nickname"
-            type="text"
-            color="purple lighten-2"
-            v-model="gambler.nickname"
-            :rules="[rules.required]"
-          />
-
-          <v-text-field
-            label="Фамилия"
-            name="family"
-            color="purple lighten-2"
-            type="text"
-            v-model="gambler.family"
-            :rules="[rules.required]"
-          />
-
-          <v-text-field
-            label="Имя"
-            name="name"
-            type="text"
-            color="purple lighten-2"
-            v-model="gambler.name"
-            :rules="[rules.required]"
-          />
-
           <v-row class="justify-space-between">
+            <v-col cols="7" md="6" class="py-0">
+              <v-text-field
+                name="nickname"
+                type="text"
+                v-model="gambler.nickname"
+                :rules="[rules.required]"
+              >
+                <template v-slot:label>
+                  <div :style="{color: 'secondary'}">Ник</div>
+                </template>
+              </v-text-field>
+
+              <v-text-field
+                label="Фамилия"
+                name="family"
+                color="purple lighten-2"
+                type="text"
+                v-model="gambler.family"
+                :rules="[rules.required]"
+              />
+
+              <v-text-field
+                label="Имя"
+                name="name"
+                type="text"
+                color="purple lighten-2"
+                v-model="gambler.name"
+                :rules="[rules.required]"
+              />
+
+              <v-label>Пол</v-label>
+              <v-radio-group class="mt-0" v-model="gambler.sex" row :rules="[rules.required]">
+                <v-radio color="primary" value="м">
+                  <template v-slot:label>
+                    <div :style="{fontSize: '1.25em', opacity: 1, color: 'rgba(0, 0, 0, 1)'}">м</div>
+                  </template>
+                </v-radio>
+                <v-radio color="pink" value="ж">
+                  <template v-slot:label>
+                    <div :style="{fontSize: '1.25em', opacity: 1, color: 'rgba(0, 0, 0, 1)'}">ж</div>
+                  </template>
+                </v-radio>
+              </v-radio-group>
+            </v-col>
+            <v-col v-if="gambler.photo" cols="5" md="6" class="py-0">
+              <v-img :src="`/photo/${gambler.photo}`"/>
+            </v-col>
+          </v-row>
+
+          <!--<v-row class="justify-space-between">
             <v-col cols="auto" class="py-0">
               <v-label>Пол</v-label>
               <v-radio-group class="mt-0" v-model="gambler.sex" row :rules="[rules.required]">
@@ -57,9 +80,9 @@
             </v-col>
 
             <v-col v-if="gambler.photo" cols="auto" class="py-0">
-              <v-img width="50" height="67" :src="`/photo/${gambler.photo}`" />
+              <v-img width="54" height="72" :src="`/photo/${gambler.photo}`"/>
             </v-col>
-          </v-row>
+          </v-row>-->
 
           <div>
             <v-file-input
@@ -68,6 +91,7 @@
               prepend-icon="fas fa-camera-retro"
               :label="this.isSign ? 'Фото участника' : 'Заменить фото'"
               show-size
+              :style="{paddingTop: 0, marginTop: 0}"
               v-model="file"
             />
             <div
@@ -153,7 +177,7 @@
         getGambler: 'gambler/getGambler'
       }),
       sm() {
-        return (this.isAuth ? '7' : '6')
+        return (this.isAuth ? '8' : '6')
       },
       md() {
         return (this.isAuth ? '7' : '4')
@@ -212,5 +236,7 @@
 </script>
 
 <style scoped>
-
+  .v-label {
+    font-size: .875em;
+  }
 </style>
