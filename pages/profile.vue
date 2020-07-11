@@ -21,7 +21,7 @@
       <v-card-text class="py-1">
         <v-form ref="form" lazy-validation>
           <v-row class="justify-space-between">
-            <v-col cols="7" md="6" class="py-0">
+            <v-col cols="7" md="6" lg="7" class="py-0">
               <v-text-field
                 name="nickname"
                 type="text"
@@ -65,7 +65,7 @@
                 </v-radio>
               </v-radio-group>
             </v-col>
-            <v-col v-if="gambler.photo" cols="5" md="6" class="py-0">
+            <v-col v-if="gambler.photo" cols="5" md="6" lg="5" class="py-0">
               <v-img :src="`/photo/${gambler.photo}`"/>
             </v-col>
           </v-row>
@@ -183,7 +183,7 @@
         return (this.isAuth ? '7' : '4')
       },
       lg() {
-        return (this.isAuth ? '6' : '3')
+        return (this.isAuth ? '5' : '3')
       },
       iconToolbar() {
         let icon = '';
