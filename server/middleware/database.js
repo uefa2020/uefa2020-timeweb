@@ -5,7 +5,7 @@ const pool = mysql.createPool({
   host: 'localhost',
   user: 'root',
   password: 'root',
-  database: 'uefa2020',
+  database: 'uefa2020-timeweb',
   /*timezone: 'Z'*/
 });
 

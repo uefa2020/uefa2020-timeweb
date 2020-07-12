@@ -6,7 +6,7 @@
     clipped
     right
     width="230"
-    mobile-break-point="700"
+    mobile-breakpoint="700"
     color="purple lighten-5"
   >
     <v-list dense>

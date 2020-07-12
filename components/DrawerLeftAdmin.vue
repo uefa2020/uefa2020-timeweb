@@ -4,7 +4,7 @@
     @input="$emit('input', $event)"
     app
     clipped
-    mobile-break-point="600"
+    mobile-breakpoint="600"
     width="215"
   >
     <v-list dense>

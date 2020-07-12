@@ -5,7 +5,7 @@
     app
     clipped
     width="150"
-    mobile-break-point="800"
+    mobile-breakpoint="800"
     color="purple lighten-5"
   >
     <v-list dense>
@@ -45,21 +45,21 @@
             to: '/gambler',
             icon: 'fas fa-users'
           },
-          {
+          /*{
             title: 'Правила',
             to: '/rule',
             icon: 'fas fa-file-alt'
-          },
-          {
+          },*/
+          /*{
             title: 'Ставки',
             to: '/stake',
             icon: 'fas fa-money-check'
-          },
-          {
+          },*/
+          /*{
             title: 'Тотализатор',
             to: '/totalizator',
             icon: 'fas fa-money-bill-alt'
-          },
+          },*/
           {
             title: 'Чат',
             to: '/chat',

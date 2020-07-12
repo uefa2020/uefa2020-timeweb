@@ -9,14 +9,14 @@
       <div class="text-center" :style="{width: '100%'}">{{message}}</div>
     </v-snackbar>
 
-    <v-content>
+    <v-main>
       <v-container
         class="fill-height purple lighten-4"
         fluid
       >
         <nuxt/>
       </v-container>
-    </v-content>
+    </v-main>
   </v-app>
 </template>
 

@@ -14,7 +14,7 @@
       <span class="title text-center">любителей футбола и острых ощущений</span>
     </div>
 
-    <v-content>
+    <v-main>
       <v-container
         class="fill-height purple lighten-4 pa-0"
         fluid
@@ -39,7 +39,7 @@
           <nuxt/>
         </v-row>
       </v-container>
-    </v-content>
+    </v-main>
   </v-app>
 </template>
 

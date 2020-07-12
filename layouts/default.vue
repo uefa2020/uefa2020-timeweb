@@ -32,7 +32,7 @@
         </v-tooltip>
       </v-app-bar-nav-icon>
 
-      <v-toolbar-title>Тотализатор</v-toolbar-title>
+      <v-toolbar-title>К л у б</v-toolbar-title>
 
       <v-spacer/>
 
@@ -50,14 +50,14 @@
 
     <!---------------------------------------------------------------------------------->
     <!-- КОНТЕНТ -->
-    <v-content>
+    <v-main>
       <v-container
         class="fill-height align-start purple lighten-4 pa-0"
         fluid
       >
         <nuxt/>
       </v-container>
-    </v-content>
+    </v-main>
 
     <!---------------------------------------------------------------------------------->
     <!-- Правая панель - РЕЗУЛЬТАТ ТОТАЛИЗАТОРА -->
